@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>估價單 / 請款單生成器 · 儒鴻 / 宏儒</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="form.css">
+</head>
+<body>
+<div class="app">
+
+  <aside class="panel">
+    <div class="p-head">
+      <a class="p-back" href="index.html">← 返回表格中心</a>
+      <div class="p-title">估價單 / 請款單</div>
+      <div class="p-sub">填寫 → 即時預覽 → 列印 / 存 PDF</div>
+    </div>
+    <div class="p-body">
+
+      <div class="sec">
+        <div class="sec-lbl">單據類型與公司</div>
+        <div class="field">
+          <label>單據類型</label>
+          <select id="f-docType">
+            <option value="估價單">估價單　Estimate</option>
+            <option value="請款單">請款單　Invoice</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>抬頭公司</label>
+          <select id="f-brand">
+            <option value="儒鴻結構土木技師事務所">儒鴻結構土木技師事務所</option>
+            <option value="宏儒營造有限公司">宏儒營造有限公司</option>
+          </select>
+        </div>
+        <div class="field">
+          <div class="toggle"><span>含 5% 營業稅</span><div class="sw" id="f-tax"></div></div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-lbl">單據資訊</div>
+        <div class="field"><label><span id="lbl-no">估價單號</span></label><input id="f-docNo" type="text"></div>
+        <div class="grid2">
+          <div class="field"><label>開立日期</label><input id="f-docDate" type="text"></div>
+          <div class="field"><label>有效期限 / 付款期限</label><input id="f-validUntil" type="text"></div>
+        </div>
+        <div class="field"><label>承辦人員</label><input id="f-quoter" type="text"></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-lbl">業主資料</div>
+        <div class="field"><label>業主名稱</label><input id="f-clientName" type="text"></div>
+        <div class="grid2">
+          <div class="field"><label>聯絡人</label><input id="f-clientContact" type="text"></div>
+          <div class="field"><label>聯絡電話</label><input id="f-clientPhone" type="text"></div>
+        </div>
+        <div class="field"><label>工程名稱</label><input id="f-projectName" type="text"></div>
+        <div class="field"><label>工程地點</label><input id="f-projectLocation" type="text"></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-lbl">項目明細</div>
+        <div id="items-editor"></div>
+        <button class="btn btn-ghost" id="add-item">＋ 新增項目</button>
+      </div>
+
+      <!-- 請款專用 -->
+      <div class="sec" id="invoice-sec" style="display:none;">
+        <div class="sec-lbl">請款 / 匯款資訊</div>
+        <div class="field"><label>本次已收 / 已付（將自總計扣除，0 為全額請款）</label><input id="f-paidAmount" type="number" placeholder="0"></div>
+        <div class="grid2">
+          <div class="field"><label>匯款銀行</label><input id="f-bankName" type="text" placeholder="例：台灣銀行 豐原分行"></div>
+          <div class="field"><label>銀行代號</label><input id="f-bankCode" type="text" placeholder="例：004"></div>
+        </div>
+        <div class="grid2">
+          <div class="field"><label>戶名</label><input id="f-bankAcct" type="text"></div>
+          <div class="field"><label>帳號</label><input id="f-bankNo" type="text"></div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-lbl">說明條款</div>
+        <div class="field"><textarea id="f-terms" rows="6" placeholder="每行一條"></textarea></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-lbl">輸出</div>
+        <button class="btn btn-gold" id="btn-print" style="margin-bottom:8px;">🖨 列印 / 存成 PDF</button>
+        <div class="btn-row">
+          <button class="btn btn-dark" id="btn-save">💾 另存此份</button>
+          <button class="btn btn-ghost" id="btn-new">＋ 開新單</button>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-lbl">已儲存單據</div>
+        <div id="saved-list"></div>
+      </div>
+
+    </div>
+  </aside>
+
+  <main class="stage">
+    <div class="stage-chrome">
+      <div class="sc-left">
+        <div class="sc-kicker" id="sc-kicker">Estimate · 工程估價單</div>
+        <div class="sc-name" id="sc-name"></div>
+        <div class="hint">左側修改即時更新；自動記住上次內容。</div>
+      </div>
+    </div>
+    <div class="paper" id="paper"></div>
+  </main>
+
+</div>
+
+<script src="shared.js"></script>
+<script>
+(function(){
+  "use strict";
+  var H = window.HJ;
+
+  var DEFAULT_TERMS = [
+    "一、本單有效期限為開立日起 30 日內，逾期請重新洽詢。",
+    "二、本單未含業主自辦之申請規費、雜項及保險費用。",
+    "三、工程數量以實作實算為準，異動部分另行估驗計價。",
+    "四、付款條件依雙方合約約定辦理。"
+  ];
+
+  function defaultState(){
+    return {
+      docType:"估價單", brand:"儒鴻結構土木技師事務所", showTax:false,
+      docNo:"EJ-1150623-01", docDate:"2026 / 06 / 23", validUntil:"2026 / 07 / 23", quoter:"陳彥儒",
+      clientName:"", clientContact:"", clientPhone:"",
+      projectName:"", projectLocation:"",
+      items:[ {name:"", spec:"", unit:"式", qty:1, price:0} ],
+      paidAmount:0, bankName:"", bankCode:"", bankAcct:"", bankNo:"",
+      terms: DEFAULT_TERMS.slice()
+    };
+  }
+
+  var store = H.makeStore("hj_estimate_current","hj_estimate_saved",defaultState);
+  var state = store.loadCur();
+  if(!state.terms) state.terms = DEFAULT_TERMS.slice();
+
+  function refresh(){ store.saveCur(state); render(); }
+
+  function render(){
+    var cfg = H.BRANDS[state.brand] || H.BRANDS["儒鴻結構土木技師事務所"];
+    var isInvoice = state.docType==="請款單";
+    var TARGET=8, rows="", subtotal=0, count=Math.max(TARGET,state.items.length);
+    for(var i=0;i<count;i++){
+      var it=state.items[i], alt=(i%2===1)?"q-row-alt":"";
+      if(it){
+        var amt=(Number(it.qty)||0)*(Number(it.price)||0); subtotal+=amt;
+        rows+='<tr class="'+alt+'"><td class="q-td q-num" style="text-align:center;color:#8C8576;">'+(i+1)+'</td>'+
+          '<td class="q-td"><div style="font-weight:600;color:#0A1A33;">'+H.esc(it.name)+'</div>'+(it.spec?'<div style="font-size:10.5px;color:#6B6557;margin-top:2px;">'+H.esc(it.spec)+'</div>':'')+'</td>'+
+          '<td class="q-td" style="text-align:center;color:#6B6557;">'+H.esc(it.unit)+'</td>'+
+          '<td class="q-td q-num">'+(it.qty!=null&&it.qty!==""?H.fmt(it.qty):"")+'</td>'+
+          '<td class="q-td q-num">'+(it.price!=null&&it.price!==""?H.fmt(it.price):"")+'</td>'+
+          '<td class="q-td q-num" style="font-weight:600;color:#0A1A33;">'+H.fmt(amt)+'</td></tr>';
+      } else {
+        rows+='<tr class="'+alt+'"><td class="q-td q-num" style="text-align:center;color:#8C8576;">'+(i+1)+'</td><td class="q-td">&nbsp;</td><td class="q-td"></td><td class="q-td"></td><td class="q-td"></td><td class="q-td"></td></tr>';
+      }
+    }
+    var tax=state.showTax?Math.round(subtotal*0.05):0;
+    var total=subtotal+tax;
+    var paid=Number(state.paidAmount)||0;
+    var due=total-paid;
+
+    var taxRow=state.showTax?'<div style="display:flex;justify-content:space-between;padding:6px 12px;font-size:12px;color:#322F27;border-top:1px solid #EFEBE2;"><span style="color:#6B6557;">營業稅 5%</span><span class="q-num">NT$ '+H.fmt(tax)+'</span></div>':'';
+    var paidRow=(isInvoice&&paid>0)?'<div style="display:flex;justify-content:space-between;padding:6px 12px;font-size:12px;color:#322F27;border-top:1px solid #EFEBE2;"><span style="color:#6B6557;">已收 / 已付</span><span class="q-num">- NT$ '+H.fmt(paid)+'</span></div>':'';
+    var bigLabel=isInvoice?'本次應付 DUE':'總計 TOTAL';
+    var bigVal=isInvoice?due:total;
+
+    var termsArr=(state.terms||[]).filter(function(t){return t&&t.trim();});
+    var termsHtml=termsArr.map(function(t){return '<div>'+H.esc(t)+'</div>';}).join("");
+
+    // bank block for invoice
+    var bankHtml="";
+    if(isInvoice && (state.bankName||state.bankAcct||state.bankNo)){
+      bankHtml='<div style="margin-top:12px;padding:11px 14px;background:#0A1A33;border-radius:4px;color:#fff;">'+
+        '<div style="font-family:Archivo,sans-serif;font-size:9px;font-weight:600;letter-spacing:0.16em;color:#D9B96E;text-transform:uppercase;margin-bottom:7px;">Remittance · 匯款資訊</div>'+
+        '<div style="display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:11px;">'+
+          '<span style="color:#8AA8CE;">銀行</span><span style="color:#fff;font-weight:600;">'+H.esc(state.bankName)+(state.bankCode?'（'+H.esc(state.bankCode)+'）':'')+'</span>'+
+          '<span style="color:#8AA8CE;">戶名</span><span style="color:#fff;font-weight:600;">'+H.esc(state.bankAcct)+'</span>'+
+          '<span style="color:#8AA8CE;">帳號</span><span style="color:#fff;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:0.04em;">'+H.esc(state.bankNo)+'</span>'+
+        '</div></div>';
+    }
+
+    document.getElementById("sc-name").textContent = cfg.brandName+"　"+state.docType;
+    document.getElementById("sc-kicker").textContent = isInvoice?"Invoice · 工程請款單":"Estimate · 工程估價單";
+
+    document.getElementById("paper").innerHTML =
+    '<div class="topbar"></div><div class="pad">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;padding-bottom:16px;border-bottom:1.5px solid #0A1A33;">'+
+        '<div style="display:flex;gap:13px;align-items:flex-start;min-width:0;">'+
+          '<img src="'+cfg.logoSrc+'" alt="logo" style="height:46px;width:auto;display:block;flex:none;margin-top:2px;">'+
+          '<div style="min-width:0;"><div style="font-weight:700;font-size:19px;color:#0A1A33;line-height:1.2;">'+H.esc(cfg.brandName)+'</div>'+
+          '<div style="font-family:Archivo,sans-serif;font-weight:600;font-size:8px;letter-spacing:0.06em;color:#8C8576;margin-top:3px;">'+H.esc(cfg.brandEng)+'</div>'+
+          '<div style="font-size:10.5px;color:#6B6557;line-height:1.7;margin-top:9px;"><div>'+H.ADDR+'</div><div>'+H.TEL+'</div><div>統一編號 '+cfg.taxId+'　·　'+cfg.brandEmail+'</div></div></div>'+
+        '</div>'+
+        '<div style="flex:none;text-align:right;">'+
+          '<div style="font-family:\'Noto Serif TC\',serif;font-weight:600;font-size:34px;color:#0A1A33;letter-spacing:0.18em;padding-left:0.18em;">'+state.docType+'</div>'+
+          '<div style="font-family:Archivo,sans-serif;font-size:9.5px;font-weight:600;letter-spacing:0.26em;color:#9A7B2A;text-transform:uppercase;margin-top:1px;">'+(isInvoice?"Invoice":"Estimate")+'</div>'+
+          '<div style="display:inline-grid;grid-template-columns:auto auto;gap:5px 12px;margin-top:13px;font-size:11px;text-align:left;">'+
+            '<div style="color:#6B6557;">單據號碼</div><div style="color:#322F27;font-weight:600;font-variant-numeric:tabular-nums;">'+H.esc(state.docNo)+'</div>'+
+            '<div style="color:#6B6557;">開立日期</div><div style="color:#322F27;font-weight:600;font-variant-numeric:tabular-nums;">'+H.esc(state.docDate)+'</div>'+
+            '<div style="color:#6B6557;">'+(isInvoice?"付款期限":"有效期限")+'</div><div style="color:#322F27;font-weight:600;font-variant-numeric:tabular-nums;">'+H.esc(state.validUntil)+'</div>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 26px;margin-top:16px;padding:14px 16px;background:#F8F6F0;border:1px solid #E2DDD1;border-radius:4px;">'+
+        '<div style="display:grid;grid-template-columns:62px 1fr;row-gap:7px;font-size:11.5px;">'+
+          '<div style="color:#9A7B2A;font-weight:600;">業主</div><div style="color:#0A1A33;font-weight:600;">'+H.esc(state.clientName)+'</div>'+
+          '<div style="color:#9A7B2A;font-weight:600;">聯絡人</div><div style="color:#322F27;">'+H.esc(state.clientContact)+'</div>'+
+          '<div style="color:#9A7B2A;font-weight:600;">聯絡電話</div><div style="color:#322F27;">'+H.esc(state.clientPhone)+'</div>'+
+        '</div>'+
+        '<div style="display:grid;grid-template-columns:62px 1fr;row-gap:7px;font-size:11.5px;border-left:1px solid #E2DDD1;padding-left:24px;">'+
+          '<div style="color:#9A7B2A;font-weight:600;">工程名稱</div><div style="color:#0A1A33;font-weight:600;">'+H.esc(state.projectName)+'</div>'+
+          '<div style="color:#9A7B2A;font-weight:600;">工程地點</div><div style="color:#322F27;">'+H.esc(state.projectLocation)+'</div>'+
+          '<div style="color:#9A7B2A;font-weight:600;">承辦人員</div><div style="color:#322F27;">'+H.esc(state.quoter)+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<table style="width:100%;border-collapse:collapse;margin-top:16px;table-layout:fixed;">'+
+        '<colgroup><col style="width:8%;"><col style="width:40%;"><col style="width:9%;"><col style="width:11%;"><col style="width:15%;"><col style="width:17%;"></colgroup>'+
+        '<thead><tr><th class="q-th" style="text-align:center;border-radius:4px 0 0 0;">項次</th><th class="q-th">品名 / 規格說明</th><th class="q-th" style="text-align:center;">單位</th><th class="q-th" style="text-align:right;">數量</th><th class="q-th" style="text-align:right;">單價</th><th class="q-th" style="text-align:right;border-radius:0 4px 0 0;">複價</th></tr></thead>'+
+        '<tbody>'+rows+'</tbody></table>'+
+      '<div style="display:flex;justify-content:flex-end;margin-top:14px;"><div style="width:54%;">'+
+        '<div style="display:flex;justify-content:space-between;padding:6px 12px;font-size:12px;color:#322F27;"><span style="color:#6B6557;">小計</span><span class="q-num">NT$ '+H.fmt(subtotal)+'</span></div>'+
+        taxRow+paidRow+
+        '<div style="display:flex;justify-content:space-between;align-items:baseline;padding:10px 12px;margin-top:4px;background:#0A1A33;border-radius:4px;"><span style="color:#D9B96E;font-weight:600;font-size:13px;letter-spacing:0.04em;">'+bigLabel+'</span><span class="q-num" style="color:#fff;font-weight:700;font-size:18px;">NT$ '+H.fmt(bigVal)+'</span></div>'+
+      '</div></div>'+
+      '<div style="margin-top:9px;padding:7px 12px;border:1px solid #E2DDD1;border-left:3px solid #C9A24A;border-radius:3px;font-size:11.5px;color:#322F27;"><span style="color:#9A7B2A;font-weight:600;">'+(isInvoice?"應付金額（國字大寫）":"總價金額（國字大寫）")+'</span>　新臺幣 '+H.cjk(bigVal)+' 元整</div>'+
+      bankHtml+
+      (termsHtml?'<div style="margin-top:18px;"><div style="font-family:Archivo,sans-serif;font-size:10px;font-weight:600;letter-spacing:0.18em;color:#9A7B2A;text-transform:uppercase;margin-bottom:6px;">Terms · 說明</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:5px 24px;font-size:10.5px;color:#4B473C;line-height:1.65;">'+termsHtml+'</div></div>':'')+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px;">'+
+        '<div style="border:1px solid #E2DDD1;border-radius:4px;padding:11px 14px 14px;"><div style="font-size:11px;color:#9A7B2A;font-weight:600;margin-bottom:6px;">開立單位（簽章用印）</div><div style="font-size:12px;color:#0A1A33;font-weight:600;">'+H.esc(cfg.brandName)+'</div><div style="height:46px;"></div><div style="display:flex;gap:18px;font-size:10.5px;color:#6B6557;"><span>負責人：＿＿＿＿＿＿</span><span>承辦：'+H.esc(state.quoter)+'</span></div></div>'+
+        '<div style="border:1px solid #E2DDD1;border-radius:4px;padding:11px 14px 14px;"><div style="font-size:11px;color:#9A7B2A;font-weight:600;margin-bottom:6px;">業主確認（簽章用印）</div><div style="font-size:12px;color:#0A1A33;font-weight:600;">'+H.esc(state.clientName)+'</div><div style="height:46px;"></div><div style="display:flex;gap:18px;font-size:10.5px;color:#6B6557;"><span>簽認：＿＿＿＿＿＿</span><span>日期：＿＿＿／＿＿／＿＿</span></div></div>'+
+      '</div>'+
+      '<div style="margin-top:16px;padding-top:10px;border-top:1px solid #E2DDD1;display:flex;justify-content:space-between;align-items:center;"><div style="font-family:Archivo,sans-serif;font-size:8.5px;font-weight:600;letter-spacing:0.14em;color:#ADA796;text-transform:uppercase;">'+H.esc(cfg.brandEng)+'</div><div style="font-size:9.5px;color:#ADA796;letter-spacing:0.08em;">築基立信　·　感謝您的惠顧</div></div>'+
+    '</div>';
+  }
+
+  function renderItemsEditor(){
+    var box=document.getElementById("items-editor"); box.innerHTML="";
+    state.items.forEach(function(it,idx){
+      var row=document.createElement("div"); row.className="item-row";
+      var amt=(Number(it.qty)||0)*(Number(it.price)||0);
+      row.innerHTML='<div class="ir-top"><span class="ir-no">項次 '+(idx+1)+'</span><button class="ir-del" data-del="'+idx+'">✕ 刪除</button></div>'+
+        '<input data-f="name" data-i="'+idx+'" placeholder="品名" value="'+H.esc(it.name)+'">'+
+        '<input data-f="spec" data-i="'+idx+'" placeholder="規格說明（可留空）" value="'+H.esc(it.spec)+'">'+
+        '<div class="ir-3"><input data-f="unit" data-i="'+idx+'" placeholder="單位" value="'+H.esc(it.unit)+'"><input data-f="qty" data-i="'+idx+'" type="number" placeholder="數量" value="'+H.esc(it.qty)+'"><input data-f="price" data-i="'+idx+'" type="number" placeholder="單價" value="'+H.esc(it.price)+'"></div>'+
+        '<div class="ir-amt">複價 <b>NT$ '+H.fmt(amt)+'</b></div>';
+      box.appendChild(row);
+    });
+  }
+
+  function renderSavedList(){
+    var box=document.getElementById("saved-list"), saved=store.loadSaved(), names=Object.keys(saved);
+    if(!names.length){ box.innerHTML='<div class="empty-note">尚無儲存的單據</div>'; return; }
+    box.innerHTML=""; names.sort(function(a,b){return (saved[b]._ts||0)-(saved[a]._ts||0);});
+    names.forEach(function(name){
+      var rec=saved[name], d=rec._ts?new Date(rec._ts):null, meta=d?(d.getMonth()+1)+"/"+d.getDate():"";
+      var el=document.createElement("div"); el.className="saved-item";
+      el.innerHTML='<span class="si-name" title="'+H.esc(name)+'">'+H.esc(name)+'</span><span class="si-meta">'+meta+'</span><button class="si-btn si-load" data-load="'+H.esc(name)+'">載入</button><button class="si-btn si-del" data-sdel="'+H.esc(name)+'">刪除</button>';
+      box.appendChild(el);
+    });
+  }
+
+  function syncDocTypeUI(){
+    var isInvoice=state.docType==="請款單";
+    document.getElementById("invoice-sec").style.display = isInvoice?"":"none";
+    document.getElementById("lbl-no").textContent = isInvoice?"請款單號":"估價單號";
+  }
+
+  function fillForm(){
+    document.getElementById("f-docType").value=state.docType;
+    document.getElementById("f-brand").value=state.brand;
+    document.getElementById("f-tax").classList.toggle("on",!!state.showTax);
+    ["docNo","docDate","validUntil","quoter","clientName","clientContact","clientPhone","projectName","projectLocation","paidAmount","bankName","bankCode","bankAcct","bankNo"].forEach(function(k){
+      var el=document.getElementById("f-"+k); if(el) el.value=state[k]==null?"":state[k];
+    });
+    document.getElementById("f-terms").value=(state.terms||[]).join("\n");
+    syncDocTypeUI(); renderItemsEditor();
+  }
+
+  function bind(){
+    ["docNo","docDate","validUntil","quoter","clientName","clientContact","clientPhone","projectName","projectLocation","bankName","bankCode","bankAcct","bankNo"].forEach(function(k){
+      document.getElementById("f-"+k).addEventListener("input",function(e){ state[k]=e.target.value; refresh(); });
+    });
+    document.getElementById("f-paidAmount").addEventListener("input",function(e){ state.paidAmount=e.target.value===""?0:Number(e.target.value); refresh(); });
+    document.getElementById("f-docType").addEventListener("change",function(e){ state.docType=e.target.value; syncDocTypeUI(); refresh(); });
+    document.getElementById("f-brand").addEventListener("change",function(e){ state.brand=e.target.value; refresh(); });
+    document.getElementById("f-tax").addEventListener("click",function(){ state.showTax=!state.showTax; this.classList.toggle("on",state.showTax); refresh(); });
+    document.getElementById("f-terms").addEventListener("input",function(e){ state.terms=e.target.value.split("\n"); refresh(); });
+
+    var box=document.getElementById("items-editor");
+    box.addEventListener("input",function(e){
+      var t=e.target; if(!t.dataset.f) return;
+      var i=+t.dataset.i, f=t.dataset.f;
+      state.items[i][f]=(f==="qty"||f==="price")?(t.value===""?"":Number(t.value)):t.value;
+      var amt=(Number(state.items[i].qty)||0)*(Number(state.items[i].price)||0);
+      var amtEl=t.closest(".item-row").querySelector(".ir-amt"); if(amtEl) amtEl.innerHTML='複價 <b>NT$ '+H.fmt(amt)+'</b>';
+      refresh();
+    });
+    box.addEventListener("click",function(e){
+      var del=e.target.dataset.del; if(del==null) return;
+      state.items.splice(+del,1); if(!state.items.length) state.items.push({name:"",spec:"",unit:"式",qty:1,price:0});
+      renderItemsEditor(); refresh();
+    });
+    document.getElementById("add-item").addEventListener("click",function(){ state.items.push({name:"",spec:"",unit:"式",qty:1,price:0}); renderItemsEditor(); refresh(); });
+
+    document.getElementById("btn-print").addEventListener("click",function(){ window.print(); });
+    document.getElementById("btn-new").addEventListener("click",function(){
+      if(!confirm("開新單會清空目前內容（已另存的不受影響），確定嗎？")) return;
+      var dt=state.docType; state=defaultState(); state.docType=dt; state.docNo=""; fillForm(); refresh();
+    });
+    document.getElementById("btn-save").addEventListener("click",function(){
+      var sug=(state.clientName?state.clientName+"｜":"")+(state.projectName||state.docNo||state.docType);
+      var name=prompt("為這份單據命名：",sug); if(!name) return;
+      var saved=store.loadSaved(), copy=JSON.parse(JSON.stringify(state)); copy._ts=Date.now();
+      saved[name]=copy; store.writeSaved(saved); renderSavedList(); alert("已儲存：「"+name+"」");
+    });
+    document.getElementById("saved-list").addEventListener("click",function(e){
+      var ld=e.target.dataset.load, dl=e.target.dataset.sdel;
+      if(ld!=null){ var saved=store.loadSaved(), rec=saved[ld]; if(!rec) return; state=JSON.parse(JSON.stringify(rec)); delete state._ts; if(!state.terms) state.terms=DEFAULT_TERMS.slice(); fillForm(); refresh(); }
+      else if(dl!=null){ if(!confirm("刪除「"+dl+"」？")) return; var s=store.loadSaved(); delete s[dl]; store.writeSaved(s); renderSavedList(); }
+    });
+  }
+
+  fillForm(); bind(); render(); renderSavedList();
+})();
+</script>
+</body>
+</html>

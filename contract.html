@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>工程合約生成器 · 儒鴻 / 宏儒</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="form.css">
+<style>
+  .paper.contract{min-height:297mm;height:auto;}
+  .art-row{background:#fff;border:1px solid #D8D1C2;border-radius:6px;padding:10px;margin-bottom:9px;}
+  .art-row .ir-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
+  .art-row .ir-no{font-family:'Archivo',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.1em;color:#9A7B2A;}
+  .art-row input,.art-row textarea{width:100%;font-family:inherit;font-size:12px;border:1px solid #E2DCCD;border-radius:4px;padding:5px 7px;margin-bottom:5px;outline:none;}
+  .art-row textarea{resize:vertical;line-height:1.5;}
+  .art-row input:focus,.art-row textarea:focus{border-color:#C9A24A;}
+  .art-move{display:flex;gap:4px;}
+  .art-move button,.ir-del{border:none;background:none;cursor:pointer;font-size:11px;font-weight:600;padding:2px 5px;border-radius:4px;color:#6B6557;}
+  .art-move button:hover{background:#F0EBDF;}
+  .ir-del{color:#B24A4A;}.ir-del:hover{background:#FBEAEA;}
+  @media print{ .paper.contract{min-height:0 !important;} }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="panel">
+    <div class="p-head">
+      <a class="p-back" href="index.html">← 返回表格中心</a>
+      <div class="p-title">工程合約生成器</div>
+      <div class="p-sub">填寫 → 即時預覽 → 列印 / 存 PDF</div>
+    </div>
+    <div class="p-body">
+
+      <div class="sec">
+        <div class="sec-lbl">立約方</div>
+        <div class="field">
+          <label>乙方（承攬單位）</label>
+          <select id="f-brand">
+            <option value="儒鴻結構土木技師事務所">儒鴻結構土木技師事務所</option>
+            <option value="宏儒營造有限公司">宏儒營造有限公司</option>
+          </select>
+        </div>
+        <div class="field"><label>甲方（業主）名稱</label><input id="f-partyA" type="text"></div>
+        <div class="grid2">
+          <div class="field"><label>甲方代表人</label><input id="f-partyARep" type="text"></div>
+          <div class="field"><label>甲方統一編號</label><input id="f-partyATax" type="text"></div>
+        </div>
+        <div class="field"><label>甲方地址</label><input id="f-partyAAddr" type="text"></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-lbl">合約資訊</div>
+        <div class="field"><label>合約編號</label><input id="f-cNo" type="text"></div>
+        <div class="field"><label>工程名稱</label><input id="f-projectName" type="text"></div>
+        <div class="field"><label>工程地點</label><input id="f-projectLocation" type="text"></div>
+        <div class="grid2">
+          <div class="field"><label>合約總價（數字）</label><input id="f-amount" type="number" placeholder="0"></div>
+          <div class="field"><div class="toggle"><span>含 5% 稅</span><div class="sw" id="f-tax"></div></div></div>
+        </div>
+        <div class="grid2">
+          <div class="field"><label>開工日期</label><input id="f-startDate" type="text"></div>
+          <div class="field"><label>完工日期 / 工期</label><input id="f-endDate" type="text"></div>
+        </div>
+        <div class="field"><label>簽約日期</label><input id="f-signDate" type="text"></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-lbl">合約條款</div>
+        <div id="art-editor"></div>
+        <button class="btn btn-ghost" id="add-art">＋ 新增條款</button>
+      </div>
+
+      <div class="sec">
+        <div class="sec-lbl">輸出</div>
+        <button class="btn btn-gold" id="btn-print" style="margin-bottom:8px;">🖨 列印 / 存成 PDF</button>
+        <div class="btn-row">
+          <button class="btn btn-dark" id="btn-save">💾 另存此份</button>
+          <button class="btn btn-ghost" id="btn-new">＋ 開新約</button>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-lbl">已儲存合約</div>
+        <div id="saved-list"></div>
+      </div>
+
+    </div>
+  </aside>
+
+  <main class="stage">
+    <div class="stage-chrome">
+      <div class="sc-left">
+        <div class="sc-kicker">Contract · 工程合約書</div>
+        <div class="sc-name" id="sc-name"></div>
+        <div class="hint">內容過長會自動分頁列印；自動記住上次內容。</div>
+      </div>
+    </div>
+    <div class="paper contract" id="paper"></div>
+  </main>
+
+</div>
+
+<script src="shared.js"></script>
+<script>
+(function(){
+  "use strict";
+  var H = window.HJ;
+
+  var DEFAULT_ARTS = [
+    {title:"工程範圍", body:"乙方應依甲方提供之圖說及雙方議定之規範，完成本工程之全部施作，包含相關材料、施工、檢測及必要之文件編製。"},
+    {title:"合約價金", body:"本工程總價詳如合約首頁所載，除契約變更或追加減項目外，不因物價波動而調整。"},
+    {title:"工期", body:"本工程自開工日起算，乙方應於約定完工日前完工。因不可歸責於乙方之事由致工期延誤者，得依實際情形協議展延。"},
+    {title:"付款方式", body:"工程款依雙方約定之期程辦理：簽約、施工進度及完工驗收各階段分期給付，詳依雙方另行議定之付款明細辦理。"},
+    {title:"驗收", body:"工程完工後由甲方會同乙方辦理驗收，驗收合格後始得辦理結算與尾款給付。如有瑕疵，乙方應於期限內無償修繕。"},
+    {title:"保固", body:"本工程自驗收合格之日起，乙方負保固責任，保固期間內因施工不良所生之瑕疵，由乙方負責修復。"},
+    {title:"違約責任", body:"任一方違反本合約約定致他方受損害者，應負損害賠償責任；逾期完工者，得按日計罰，比例由雙方議定。"},
+    {title:"其他", body:"本合約如有未盡事宜，依相關法令及雙方協議辦理。本合約壹式貳份，甲乙雙方各執乙份為憑。"}
+  ];
+
+  function defaultState(){
+    return {
+      brand:"儒鴻結構土木技師事務所",
+      partyA:"", partyARep:"", partyATax:"", partyAAddr:"",
+      cNo:"CJ-1150623-01", projectName:"", projectLocation:"",
+      amount:0, showTax:false,
+      startDate:"2026 / 07 / 01", endDate:"2026 / 12 / 31", signDate:"2026 / 06 / 23",
+      arts: DEFAULT_ARTS.map(function(a){return {title:a.title,body:a.body};})
+    };
+  }
+
+  var store = H.makeStore("hj_contract_current","hj_contract_saved",defaultState);
+  var state = store.loadCur();
+  if(!state.arts) state.arts = defaultState().arts;
+  function refresh(){ store.saveCur(state); render(); }
+
+  var CN = ["零","一","二","三","四","五","六","七","八","九","十","十一","十二","十三","十四","十五","十六","十七","十八","十九","二十"];
+  function cnNum(i){ return CN[i]||String(i); }
+
+  function render(){
+    var cfg = H.BRANDS[state.brand] || H.BRANDS["儒鴻結構土木技師事務所"];
+    var base = Number(state.amount)||0;
+    var total = state.showTax ? Math.round(base*1.05) : base;
+    document.getElementById("sc-name").textContent = cfg.brandName+"　工程合約書";
+
+    var artsHtml = (state.arts||[]).filter(function(a){return (a.title&&a.title.trim())||(a.body&&a.body.trim());}).map(function(a,idx){
+      return '<div style="margin-bottom:13px;break-inside:avoid;">'+
+        '<div style="font-weight:700;font-size:12.5px;color:#0A1A33;margin-bottom:4px;">第 '+cnNum(idx+1)+' 條　'+H.esc(a.title)+'</div>'+
+        '<div style="font-size:11.5px;color:#3A372E;line-height:1.85;text-align:justify;">'+H.esc(a.body).replace(/\n/g,"<br>")+'</div>'+
+      '</div>';
+    }).join("");
+
+    document.getElementById("paper").innerHTML =
+    '<div class="topbar"></div><div class="pad">'+
+      // header
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;padding-bottom:14px;border-bottom:1.5px solid #0A1A33;">'+
+        '<div style="display:flex;gap:13px;align-items:flex-start;"><img src="'+cfg.logoSrc+'" style="height:42px;width:auto;margin-top:2px;">'+
+          '<div><div style="font-weight:700;font-size:17px;color:#0A1A33;">'+H.esc(cfg.brandName)+'</div>'+
+          '<div style="font-family:Archivo,sans-serif;font-weight:600;font-size:7.5px;letter-spacing:0.06em;color:#8C8576;margin-top:3px;">'+H.esc(cfg.brandEng)+'</div></div></div>'+
+        '<div style="text-align:right;"><div style="font-size:10.5px;color:#6B6557;">合約編號</div><div style="font-weight:600;font-size:12px;color:#322F27;font-variant-numeric:tabular-nums;">'+H.esc(state.cNo)+'</div></div>'+
+      '</div>'+
+
+      // title
+      '<div style="text-align:center;margin:18px 0 16px;">'+
+        '<div style="font-family:\'Noto Serif TC\',serif;font-weight:700;font-size:25px;color:#0A1A33;letter-spacing:0.22em;padding-left:0.22em;">工程合約書</div>'+
+        '<div style="font-family:Archivo,sans-serif;font-size:9px;font-weight:600;letter-spacing:0.26em;color:#9A7B2A;text-transform:uppercase;margin-top:4px;">Construction Contract</div>'+
+      '</div>'+
+
+      // parties
+      '<div style="font-size:11.5px;color:#3A372E;line-height:1.9;padding:13px 16px;background:#F8F6F0;border:1px solid #E2DDD1;border-radius:4px;">'+
+        '立合約書人：'+
+        '<div style="display:grid;grid-template-columns:48px 1fr;gap:4px 10px;margin-top:6px;">'+
+          '<span style="color:#9A7B2A;font-weight:600;">甲方</span><span style="color:#0A1A33;font-weight:600;">'+(H.esc(state.partyA)||"＿＿＿＿＿＿＿＿")+'　'+(state.partyARep?'（代表人：'+H.esc(state.partyARep)+'）':'')+(state.partyATax?'　統編 '+H.esc(state.partyATax):'')+'</span>'+
+          (state.partyAAddr?'<span style="color:#9A7B2A;"></span><span style="color:#6B6557;font-size:10.5px;">'+H.esc(state.partyAAddr)+'</span>':'')+
+          '<span style="color:#9A7B2A;font-weight:600;">乙方</span><span style="color:#0A1A33;font-weight:600;">'+H.esc(cfg.brandName)+'　統編 '+cfg.taxId+'</span>'+
+          '<span style="color:#9A7B2A;"></span><span style="color:#6B6557;font-size:10.5px;">'+H.ADDR+'　'+H.TEL+'</span>'+
+        '</div>'+
+        '<div style="margin-top:8px;">茲就「<b style="color:#0A1A33;">'+(H.esc(state.projectName)||"＿＿＿＿＿＿")+'</b>」工程，雙方同意訂立本合約，條款如下：</div>'+
+      '</div>'+
+
+      // key facts
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 26px;margin-top:12px;padding:12px 16px;border:1px solid #E2DDD1;border-radius:4px;">'+
+        '<div style="display:grid;grid-template-columns:58px 1fr;row-gap:6px;font-size:11px;">'+
+          '<span style="color:#9A7B2A;font-weight:600;">工程地點</span><span style="color:#322F27;">'+(H.esc(state.projectLocation)||"—")+'</span>'+
+          '<span style="color:#9A7B2A;font-weight:600;">開工日期</span><span style="color:#322F27;">'+H.esc(state.startDate)+'</span>'+
+          '<span style="color:#9A7B2A;font-weight:600;">完工日期</span><span style="color:#322F27;">'+H.esc(state.endDate)+'</span>'+
+        '</div>'+
+        '<div style="border-left:1px solid #E2DDD1;padding-left:24px;">'+
+          '<div style="font-size:10.5px;color:#9A7B2A;font-weight:600;">合約總價'+(state.showTax?'（含稅）':'（未稅）')+'</div>'+
+          '<div style="font-size:20px;font-weight:700;color:#0A1A33;font-variant-numeric:tabular-nums;margin-top:3px;">NT$ '+H.fmt(total)+'</div>'+
+          '<div style="font-size:10.5px;color:#6B6557;margin-top:3px;">新臺幣 '+H.cjk(total)+' 元整</div>'+
+        '</div>'+
+      '</div>'+
+
+      // articles
+      '<div style="margin-top:16px;">'+artsHtml+'</div>'+
+
+      // signatures
+      '<div style="margin-top:24px;break-inside:avoid;">'+
+        '<div style="font-family:Archivo,sans-serif;font-size:10px;font-weight:600;letter-spacing:0.16em;color:#9A7B2A;text-transform:uppercase;margin-bottom:12px;">Signatures · 立約簽署</div>'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">'+
+          '<div style="border:1px solid #E2DDD1;border-radius:4px;padding:13px 16px 16px;">'+
+            '<div style="font-size:11px;color:#9A7B2A;font-weight:600;margin-bottom:8px;">甲方（簽章用印）</div>'+
+            '<div style="font-size:12.5px;color:#0A1A33;font-weight:700;">'+(H.esc(state.partyA)||"　")+'</div>'+
+            '<div style="font-size:10.5px;color:#6B6557;margin-top:4px;">代表人：'+(H.esc(state.partyARep)||"＿＿＿＿＿")+'</div>'+
+            '<div style="height:50px;"></div>'+
+          '</div>'+
+          '<div style="border:1px solid #E2DDD1;border-radius:4px;padding:13px 16px 16px;">'+
+            '<div style="font-size:11px;color:#9A7B2A;font-weight:600;margin-bottom:8px;">乙方（簽章用印）</div>'+
+            '<div style="font-size:12.5px;color:#0A1A33;font-weight:700;">'+H.esc(cfg.brandName)+'</div>'+
+            '<div style="font-size:10.5px;color:#6B6557;margin-top:4px;">代表人：＿＿＿＿＿</div>'+
+            '<div style="height:50px;"></div>'+
+          '</div>'+
+        '</div>'+
+        '<div style="text-align:center;margin-top:16px;font-size:12px;color:#322F27;">中　華　民　國　'+H.esc(state.signDate)+'</div>'+
+      '</div>'+
+
+      '<div style="margin-top:16px;padding-top:10px;border-top:1px solid #E2DDD1;display:flex;justify-content:space-between;align-items:center;"><div style="font-family:Archivo,sans-serif;font-size:8.5px;font-weight:600;letter-spacing:0.14em;color:#ADA796;text-transform:uppercase;">'+H.esc(cfg.brandEng)+'</div><div style="font-size:9.5px;color:#ADA796;letter-spacing:0.08em;">築基立信　·　誠信履約</div></div>'+
+    '</div>';
+  }
+
+  function renderArtEditor(){
+    var box=document.getElementById("art-editor"); box.innerHTML="";
+    state.arts.forEach(function(a,idx){
+      var row=document.createElement("div"); row.className="art-row";
+      row.innerHTML='<div class="ir-top"><span class="ir-no">第 '+cnNum(idx+1)+' 條</span><div class="art-move"><button data-up="'+idx+'" title="上移">▲</button><button data-down="'+idx+'" title="下移">▼</button><button class="ir-del" data-del="'+idx+'">✕</button></div></div>'+
+        '<input data-f="title" data-i="'+idx+'" placeholder="條款標題" value="'+H.esc(a.title)+'">'+
+        '<textarea data-f="body" data-i="'+idx+'" rows="3" placeholder="條款內容">'+H.esc(a.body)+'</textarea>';
+      box.appendChild(row);
+    });
+  }
+
+  function renderSavedList(){
+    var box=document.getElementById("saved-list"), saved=store.loadSaved(), names=Object.keys(saved);
+    if(!names.length){ box.innerHTML='<div class="empty-note">尚無儲存的合約</div>'; return; }
+    box.innerHTML=""; names.sort(function(a,b){return (saved[b]._ts||0)-(saved[a]._ts||0);});
+    names.forEach(function(name){
+      var rec=saved[name], d=rec._ts?new Date(rec._ts):null, meta=d?(d.getMonth()+1)+"/"+d.getDate():"";
+      var el=document.createElement("div"); el.className="saved-item";
+      el.innerHTML='<span class="si-name" title="'+H.esc(name)+'">'+H.esc(name)+'</span><span class="si-meta">'+meta+'</span><button class="si-btn si-load" data-load="'+H.esc(name)+'">載入</button><button class="si-btn si-del" data-sdel="'+H.esc(name)+'">刪除</button>';
+      box.appendChild(el);
+    });
+  }
+
+  function fillForm(){
+    document.getElementById("f-brand").value=state.brand;
+    document.getElementById("f-tax").classList.toggle("on",!!state.showTax);
+    ["partyA","partyARep","partyATax","partyAAddr","cNo","projectName","projectLocation","amount","startDate","endDate","signDate"].forEach(function(k){
+      var el=document.getElementById("f-"+k); if(el) el.value=state[k]==null?"":state[k];
+    });
+    renderArtEditor();
+  }
+
+  function bind(){
+    ["partyA","partyARep","partyATax","partyAAddr","cNo","projectName","projectLocation","startDate","endDate","signDate"].forEach(function(k){
+      document.getElementById("f-"+k).addEventListener("input",function(e){ state[k]=e.target.value; refresh(); });
+    });
+    document.getElementById("f-amount").addEventListener("input",function(e){ state.amount=e.target.value===""?0:Number(e.target.value); refresh(); });
+    document.getElementById("f-brand").addEventListener("change",function(e){ state.brand=e.target.value; refresh(); });
+    document.getElementById("f-tax").addEventListener("click",function(){ state.showTax=!state.showTax; this.classList.toggle("on",state.showTax); refresh(); });
+
+    var box=document.getElementById("art-editor");
+    box.addEventListener("input",function(e){
+      var t=e.target; if(!t.dataset.f) return;
+      state.arts[+t.dataset.i][t.dataset.f]=t.value; refresh();
+    });
+    box.addEventListener("click",function(e){
+      var d=e.target.dataset;
+      if(d.del!=null){ state.arts.splice(+d.del,1); if(!state.arts.length) state.arts.push({title:"",body:""}); renderArtEditor(); refresh(); }
+      else if(d.up!=null){ var i=+d.up; if(i>0){ var x=state.arts.splice(i,1)[0]; state.arts.splice(i-1,0,x); renderArtEditor(); refresh(); } }
+      else if(d.down!=null){ var j=+d.down; if(j<state.arts.length-1){ var y=state.arts.splice(j,1)[0]; state.arts.splice(j+1,0,y); renderArtEditor(); refresh(); } }
+    });
+    document.getElementById("add-art").addEventListener("click",function(){ state.arts.push({title:"",body:""}); renderArtEditor(); refresh(); });
+
+    document.getElementById("btn-print").addEventListener("click",function(){ window.print(); });
+    document.getElementById("btn-new").addEventListener("click",function(){
+      if(!confirm("開新約會清空目前內容並還原預設條款（已另存的不受影響），確定嗎？")) return;
+      state=defaultState(); state.cNo=""; state.projectName=""; state.partyA=""; fillForm(); refresh();
+    });
+    document.getElementById("btn-save").addEventListener("click",function(){
+      var sug=(state.partyA?state.partyA+"｜":"")+(state.projectName||state.cNo||"合約");
+      var name=prompt("為這份合約命名：",sug); if(!name) return;
+      var saved=store.loadSaved(), copy=JSON.parse(JSON.stringify(state)); copy._ts=Date.now();
+      saved[name]=copy; store.writeSaved(saved); renderSavedList(); alert("已儲存：「"+name+"」");
+    });
+    document.getElementById("saved-list").addEventListener("click",function(e){
+      var ld=e.target.dataset.load, dl=e.target.dataset.sdel;
+      if(ld!=null){ var saved=store.loadSaved(), rec=saved[ld]; if(!rec) return; state=JSON.parse(JSON.stringify(rec)); delete state._ts; if(!state.arts) state.arts=defaultState().arts; fillForm(); refresh(); }
+      else if(dl!=null){ if(!confirm("刪除「"+dl+"」？")) return; var s=store.loadSaved(); delete s[dl]; store.writeSaved(s); renderSavedList(); }
+    });
+  }
+
+  fillForm(); bind(); render(); renderSavedList();
+})();
+</script>
+</body>
+</html>

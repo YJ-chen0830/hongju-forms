@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>名片生成器 · 儒鴻 / 宏儒</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="form.css">
+<style>
+  .stage{background:#F1ECE2;}
+  .cards{display:flex;flex-wrap:wrap;gap:30px 34px;justify-content:center;align-items:flex-start;max-width:900px;margin:0 auto;}
+  .hj-item{display:flex;flex-direction:column;gap:10px;}
+  .hj-slot{width:calc(90mm * 1.18);height:calc(54mm * 1.18);overflow:hidden;border-radius:7px;box-shadow:0 16px 40px rgba(10,26,51,0.16);}
+  .hj-scale{transform:scale(1.18);transform-origin:top left;}
+  .hj-cap{font-family:'Archivo',sans-serif;font-size:11px;letter-spacing:0.14em;color:#6B6557;text-transform:uppercase;}
+  @media print{
+    @page{size:90mm 54mm;margin:0;}
+    html,body{background:#fff !important;}
+    .panel,.stage-chrome{display:none !important;}
+    .app{display:block !important;}
+    .stage{padding:0 !important;background:#fff !important;}
+    .cards{display:block !important;max-width:none !important;}
+    .hj-item{display:block !important;margin:0 !important;gap:0 !important;page-break-after:always;break-after:page;}
+    .hj-item:last-child{page-break-after:auto;break-after:auto;}
+    .hj-cap{display:none !important;}
+    .hj-slot{width:90mm !important;height:54mm !important;border-radius:0 !important;box-shadow:none !important;}
+    .hj-scale{transform:none !important;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="panel">
+    <div class="p-head">
+      <a class="p-back" href="index.html">← 返回表格中心</a>
+      <div class="p-title">名片生成器</div>
+      <div class="p-sub">填寫 → 即時預覽 → 列印 / 存 PDF</div>
+    </div>
+    <div class="p-body">
+
+      <div class="sec">
+        <div class="sec-lbl">基本資料</div>
+        <div class="field"><label>姓名</label><input id="f-personName" type="text"></div>
+        <div class="field"><label>手機</label><input id="f-mobile" type="text"></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-lbl">儒鴻結構（J 版）</div>
+        <div class="field"><label>職稱</label><input id="f-titleJuhong" type="text"></div>
+        <div class="field"><label>Email</label><input id="f-emailJuhong" type="text"></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-lbl">宏儒營造（H 版）</div>
+        <div class="field"><label>職稱</label><input id="f-titleHongju" type="text"></div>
+        <div class="field"><label>Email</label><input id="f-emailHongju" type="text"></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-lbl">顯示哪些面</div>
+        <div class="field"><div class="toggle"><span>儒鴻結構（正 + 背）</span><div class="sw on" id="f-showJ"></div></div></div>
+        <div class="field"><div class="toggle"><span>宏儒營造（正 + 背）</span><div class="sw on" id="f-showH"></div></div></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-lbl">輸出</div>
+        <button class="btn btn-gold" id="btn-print" style="margin-bottom:8px;">🖨 列印 / 存成 PDF</button>
+        <div class="hint" style="margin:0 0 10px;">列印時每一面自動分頁（一頁一面，90×54mm）。</div>
+        <div class="btn-row">
+          <button class="btn btn-dark" id="btn-save">💾 另存此人</button>
+          <button class="btn btn-ghost" id="btn-new">＋ 新名片</button>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-lbl">已儲存名片</div>
+        <div id="saved-list"></div>
+      </div>
+
+    </div>
+  </aside>
+
+  <main class="stage">
+    <div class="stage-chrome">
+      <div class="sc-left">
+        <div class="sc-kicker">Business Card · 名片</div>
+        <div class="sc-name">宏儒營造 ・ 儒鴻結構　雙面名片</div>
+        <div class="hint">90 × 54 mm 標準尺寸；自動記住上次內容。</div>
+      </div>
+    </div>
+    <div class="cards" id="cards"></div>
+  </main>
+
+</div>
+
+<script src="shared.js"></script>
+<script>
+(function(){
+  "use strict";
+  var H = window.HJ;
+
+  function defaultState(){
+    return {
+      personName:"陳彥儒", mobile:"0932-611-195",
+      titleJuhong:"結構・土木技師", emailJuhong:"student2173@gmail.com",
+      titleHongju:"總經理 ｜ 結構・土木技師", emailHongju:"student2173@rhtjshengyi.com",
+      showJ:true, showH:true
+    };
+  }
+  var store = H.makeStore("hj_card_current","hj_card_saved",defaultState);
+  var state = store.loadCur();
+  function refresh(){ store.saveCur(state); render(); }
+
+  // contact icons
+  var IC = {
+    pin:'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#9A7B2A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>',
+    phone:'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#9A7B2A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2"></rect><path d="M12 18h.01"></path></svg>',
+    tel:'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#9A7B2A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>',
+    fax:'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#9A7B2A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"></path><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect width="12" height="8" x="6" y="14"></rect></svg>',
+    mail:'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#9A7B2A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>',
+    tax:'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#9A7B2A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="9" y2="9"></line><line x1="4" x2="20" y1="15" y2="15"></line><line x1="10" x2="8" y1="3" y2="21"></line><line x1="16" x2="14" y1="3" y2="21"></line></svg>'
+  };
+  function ciRow(icon,text,opts){ opts=opts||{};
+    return '<div style="display:flex;align-items:'+(opts.top?"flex-start":"center")+';gap:7px;">'+
+      '<span style="flex:none;'+(opts.top?"margin-top:1px;":"")+'display:flex;">'+icon+'</span>'+
+      '<span style="font-size:'+(opts.sm?"8.5px":"9px")+';color:'+(opts.muted?"#6B6557":"#322F27")+';'+(opts.muted?"line-height:1.3;":"font-weight:600;letter-spacing:0.01em;")+'">'+text+'</span></div>';
+  }
+
+  function frontFace(cfg, title, email, nameSizePx){
+    return '<div style="position:relative;width:90mm;height:54mm;background:#FFFFFF;overflow:hidden;font-family:\'Noto Sans TC\',sans-serif;color:#322F27;">'+
+      '<div style="position:absolute;top:0;left:0;right:0;height:3px;background:#C9A24A;"></div>'+
+      '<div style="position:absolute;inset:0;padding:16px 20px;display:flex;align-items:stretch;gap:14px;">'+
+        '<div style="flex:0 0 43%;display:flex;flex-direction:column;justify-content:space-between;min-width:0;">'+
+          '<div><img src="'+cfg.logoSrc+'" style="height:31px;width:auto;display:block;">'+
+            '<div style="font-weight:700;font-size:'+nameSizePx+';line-height:1.2;color:#0A1A33;margin-top:10px;">'+H.esc(cfg.brandName)+'</div>'+
+            '<div style="font-family:Archivo,sans-serif;font-weight:600;font-size:4.4px;letter-spacing:0.07em;color:#8C8576;margin-top:3px;">'+H.esc(cfg.brandEng)+'</div></div>'+
+          '<div><div style="font-weight:700;font-size:21px;line-height:1.05;color:#0A1A33;letter-spacing:-0.01em;">'+H.esc(state.personName)+'</div>'+
+            '<div style="font-size:9.5px;color:#143257;font-weight:600;margin-top:5px;white-space:nowrap;">'+H.esc(title)+'</div></div>'+
+        '</div>'+
+        '<div style="width:1px;background:#E2DDD1;align-self:stretch;"></div>'+
+        '<div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:6.5px;">'+
+          ciRow(IC.pin,H.ADDR,{top:true,sm:true,muted:true})+
+          ciRow(IC.phone,H.esc(state.mobile))+
+          ciRow(IC.tel,H.PHONE)+
+          ciRow(IC.fax,H.FAX)+
+          ciRow(IC.mail,H.esc(email))+
+          ciRow(IC.tax,cfg.taxId)+
+        '</div>'+
+      '</div></div>';
+  }
+
+  function backFace(cfg, motto, mottoEng, services){
+    return '<div style="position:relative;width:90mm;height:54mm;background:#0A1A33;overflow:hidden;font-family:\'Noto Sans TC\',sans-serif;color:#FFFFFF;">'+
+      '<div style="position:absolute;inset:0;background-image:url(assets/blueprint-grid.svg);background-size:44px 44px;opacity:0.12;"></div>'+
+      '<div style="position:absolute;top:-44px;right:-34px;width:170px;height:170px;background:radial-gradient(circle,rgba(201,162,74,0.22),transparent 62%);"></div>'+
+      '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:18px 16px;">'+
+        '<img src="'+cfg.logoLight+'" style="height:40px;width:auto;display:block;">'+
+        '<div style="font-weight:600;font-size:15px;color:#FFFFFF;letter-spacing:0.04em;margin-top:11px;">'+H.esc(cfg.brandName)+'</div>'+
+        '<div style="font-family:Archivo,sans-serif;font-size:7px;font-weight:600;letter-spacing:0.06em;color:#8AA8CE;margin-top:4px;">'+H.esc(cfg.brandEng)+'</div>'+
+        '<div style="width:34px;height:2px;background:#C9A24A;margin:13px 0 11px;"></div>'+
+        '<div style="font-weight:600;font-size:19px;color:#D9B96E;letter-spacing:0.3em;padding-left:0.3em;">'+motto+'</div>'+
+        '<div style="font-family:Archivo,sans-serif;font-size:7.5px;font-weight:600;letter-spacing:0.16em;white-space:nowrap;color:#8AA8CE;margin-top:8px;">'+mottoEng+'</div>'+
+        '<div style="font-size:8px;letter-spacing:0.05em;color:#A8C0DC;margin-top:13px;">'+services+'</div>'+
+      '</div></div>';
+  }
+
+  function item(faceHtml, cap){
+    return '<div class="hj-item"><div class="hj-slot"><div class="hj-scale">'+faceHtml+'</div></div><div class="hj-cap">'+cap+'</div></div>';
+  }
+
+  function render(){
+    var J = H.BRANDS["儒鴻結構土木技師事務所"];
+    var Hc = H.BRANDS["宏儒營造有限公司"];
+    var out="";
+    if(state.showJ){
+      out += item(frontFace(J, state.titleJuhong, state.emailJuhong, "11px"), "儒鴻結構 · 正面 Front");
+      out += item(backFace(J, "立信致遠", "TRUST THAT GOES FAR", "結構設計 · 耐震評估 · 工程顧問 · 專業負責"), "儒鴻結構 · 背面 Back");
+    }
+    if(state.showH){
+      out += item(frontFace(Hc, state.titleHongju, state.emailHongju, "11.5px"), "宏儒營造 · 正面 Front");
+      out += item(backFace(Hc, "築基固本", "BUILD ON BEDROCK", "營造 · 施工 · 水利 · 土木 · 道路 · 橋梁 · 公共工程"), "宏儒營造 · 背面 Back");
+    }
+    if(!out) out='<div style="color:#8C8576;font-size:13px;padding:40px;">請至少開啟一間公司的名片。</div>';
+    document.getElementById("cards").innerHTML = out;
+  }
+
+  function renderSavedList(){
+    var box=document.getElementById("saved-list"), saved=store.loadSaved(), names=Object.keys(saved);
+    if(!names.length){ box.innerHTML='<div class="empty-note">尚無儲存的名片</div>'; return; }
+    box.innerHTML=""; names.sort(function(a,b){return (saved[b]._ts||0)-(saved[a]._ts||0);});
+    names.forEach(function(name){
+      var rec=saved[name], d=rec._ts?new Date(rec._ts):null, meta=d?(d.getMonth()+1)+"/"+d.getDate():"";
+      var el=document.createElement("div"); el.className="saved-item";
+      el.innerHTML='<span class="si-name" title="'+H.esc(name)+'">'+H.esc(name)+'</span><span class="si-meta">'+meta+'</span><button class="si-btn si-load" data-load="'+H.esc(name)+'">載入</button><button class="si-btn si-del" data-sdel="'+H.esc(name)+'">刪除</button>';
+      box.appendChild(el);
+    });
+  }
+
+  function fillForm(){
+    ["personName","mobile","titleJuhong","emailJuhong","titleHongju","emailHongju"].forEach(function(k){
+      var el=document.getElementById("f-"+k); if(el) el.value=state[k]==null?"":state[k];
+    });
+    document.getElementById("f-showJ").classList.toggle("on",!!state.showJ);
+    document.getElementById("f-showH").classList.toggle("on",!!state.showH);
+  }
+
+  function bind(){
+    ["personName","mobile","titleJuhong","emailJuhong","titleHongju","emailHongju"].forEach(function(k){
+      document.getElementById("f-"+k).addEventListener("input",function(e){ state[k]=e.target.value; refresh(); });
+    });
+    document.getElementById("f-showJ").addEventListener("click",function(){ state.showJ=!state.showJ; this.classList.toggle("on",state.showJ); refresh(); });
+    document.getElementById("f-showH").addEventListener("click",function(){ state.showH=!state.showH; this.classList.toggle("on",state.showH); refresh(); });
+
+    document.getElementById("btn-print").addEventListener("click",function(){ window.print(); });
+    document.getElementById("btn-new").addEventListener("click",function(){
+      if(!confirm("新名片會清空目前內容（已另存的不受影響），確定嗎？")) return;
+      state=defaultState(); state.personName=""; state.mobile=""; fillForm(); refresh();
+    });
+    document.getElementById("btn-save").addEventListener("click",function(){
+      var name=prompt("為這張名片命名：", state.personName||"名片"); if(!name) return;
+      var saved=store.loadSaved(), copy=JSON.parse(JSON.stringify(state)); copy._ts=Date.now();
+      saved[name]=copy; store.writeSaved(saved); renderSavedList(); alert("已儲存：「"+name+"」");
+    });
+    document.getElementById("saved-list").addEventListener("click",function(e){
+      var ld=e.target.dataset.load, dl=e.target.dataset.sdel;
+      if(ld!=null){ var saved=store.loadSaved(), rec=saved[ld]; if(!rec) return; state=JSON.parse(JSON.stringify(rec)); delete state._ts; fillForm(); refresh(); }
+      else if(dl!=null){ if(!confirm("刪除「"+dl+"」？")) return; var s=store.loadSaved(); delete s[dl]; store.writeSaved(s); renderSavedList(); }
+    });
+  }
+
+  fillForm(); bind(); render(); renderSavedList();
+})();
+</script>
+</body>
+</html>

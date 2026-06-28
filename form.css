@@ -1,0 +1,82 @@
+/* 儒鴻 / 宏儒 表格中心 — 共用版面樣式 */
+*{box-sizing:border-box;}
+html,body{margin:0;}
+body{font-family:'Noto Sans TC',sans-serif;background:#E7E2D8;color:#322F27;}
+
+.app{display:grid;grid-template-columns:380px 1fr;min-height:100vh;}
+.panel{background:#F6F3EC;border-right:1px solid #DAD3C4;height:100vh;overflow-y:auto;position:sticky;top:0;}
+.stage{padding:36px 28px 80px;overflow-x:auto;}
+
+.p-head{padding:18px 20px;border-bottom:1px solid #DAD3C4;position:sticky;top:0;background:#F6F3EC;z-index:5;}
+.p-back{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:#9A7B2A;text-decoration:none;font-weight:600;letter-spacing:0.04em;}
+.p-title{font-weight:700;font-size:18px;color:#0A1A33;margin:8px 0 0;}
+.p-sub{font-size:11.5px;color:#8C8576;margin-top:3px;}
+.p-body{padding:6px 20px 40px;}
+.sec{margin-top:20px;}
+.sec-lbl{font-family:'Archivo',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.16em;color:#9A7B2A;text-transform:uppercase;margin-bottom:9px;display:flex;align-items:center;gap:8px;}
+.sec-lbl::after{content:"";flex:1;height:1px;background:#E2DCCD;}
+.field{margin-bottom:11px;}
+.field label{display:block;font-size:11px;color:#6B6557;margin-bottom:4px;font-weight:500;}
+.field input,.field select,.field textarea{width:100%;font-family:inherit;font-size:12.5px;color:#0A1A33;background:#fff;border:1px solid #D8D1C2;border-radius:5px;padding:7px 9px;outline:none;transition:border-color .15s,box-shadow .15s;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#C9A24A;box-shadow:0 0 0 3px rgba(201,162,74,0.16);}
+.field textarea{resize:vertical;line-height:1.5;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px;}
+
+.toggle{display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid #D8D1C2;border-radius:5px;padding:8px 10px;}
+.toggle span{font-size:12.5px;color:#0A1A33;}
+.sw{width:40px;height:22px;border-radius:11px;background:#CDC6B6;position:relative;cursor:pointer;transition:background .18s;flex:none;}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .18s;}
+.sw.on{background:#0A1A33;}
+.sw.on::after{transform:translateX(18px);}
+
+.item-row{background:#fff;border:1px solid #D8D1C2;border-radius:6px;padding:10px;margin-bottom:9px;position:relative;}
+.item-row .ir-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
+.item-row .ir-no{font-family:'Archivo',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.1em;color:#9A7B2A;}
+.ir-del{border:none;background:none;color:#B24A4A;font-size:11px;cursor:pointer;padding:2px 4px;border-radius:4px;font-weight:600;}
+.ir-del:hover{background:#FBEAEA;}
+.item-row input{width:100%;font-family:inherit;font-size:12px;border:1px solid #E2DCCD;border-radius:4px;padding:5px 7px;margin-bottom:5px;outline:none;}
+.item-row input:focus{border-color:#C9A24A;}
+.ir-3{display:grid;grid-template-columns:1fr 1fr 1.3fr;gap:5px;}
+.ir-3 input{margin-bottom:0;}
+.ir-amt{text-align:right;font-size:11px;color:#6B6557;margin-top:6px;font-variant-numeric:tabular-nums;}
+.ir-amt b{color:#0A1A33;}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;font-size:12.5px;font-weight:600;border-radius:6px;padding:9px 14px;cursor:pointer;border:1px solid transparent;transition:all .15s;width:100%;}
+.btn-ghost{background:#fff;border-color:#D8D1C2;color:#0A1A33;}
+.btn-ghost:hover{border-color:#C9A24A;background:#FBF7EE;}
+.btn-dark{background:#0A1A33;color:#fff;}
+.btn-dark:hover{background:#16294a;}
+.btn-gold{background:#C9A24A;color:#1c1403;}
+.btn-gold:hover{background:#b8902f;}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+
+.saved-item{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E2DCCD;border-radius:5px;padding:7px 9px;margin-bottom:6px;}
+.saved-item .si-name{flex:1;min-width:0;font-size:12px;color:#0A1A33;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.saved-item .si-meta{font-size:10px;color:#ADA796;}
+.si-btn{border:none;background:none;cursor:pointer;font-size:11px;font-weight:600;padding:3px 6px;border-radius:4px;}
+.si-load{color:#9A7B2A;}.si-load:hover{background:#FBF3E0;}
+.si-del{color:#B24A4A;}.si-del:hover{background:#FBEAEA;}
+.empty-note{font-size:11px;color:#ADA796;text-align:center;padding:10px;}
+
+/* A4 preview */
+.paper{width:210mm;min-height:297mm;margin:0 auto;background:#fff;box-shadow:0 22px 60px rgba(10,26,51,0.18);position:relative;overflow:hidden;}
+.pad{padding:15mm 14mm 13mm;}
+.topbar{position:absolute;top:0;left:0;right:0;height:4px;background:#C9A24A;}
+.q-th{background:#0A1A33;color:#fff;font-weight:500;font-size:11.5px;letter-spacing:0.04em;padding:9px 10px;text-align:left;}
+.q-td{padding:8px 10px;font-size:12px;color:#322F27;border-bottom:1px solid #E2DDD1;vertical-align:top;line-height:1.4;}
+.q-row-alt{background:#FAF8F3;}
+.q-num{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap;}
+
+.stage-chrome{max-width:210mm;margin:0 auto 22px;display:flex;justify-content:space-between;align-items:flex-end;gap:16px;}
+.sc-left .sc-kicker{font-family:'Archivo',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.2em;color:#9A7B2A;text-transform:uppercase;}
+.sc-left .sc-name{font-weight:600;font-size:20px;color:#0A1A33;margin-top:5px;}
+.hint{font-size:11px;color:#8C8576;margin-top:4px;}
+
+@media print{
+  @page{size:A4;margin:0;}
+  html,body{background:#fff !important;}
+  .panel,.stage-chrome{display:none !important;}
+  .app{display:block !important;}
+  .stage{padding:0 !important;overflow:visible !important;}
+  .paper{box-shadow:none !important;margin:0 !important;width:210mm !important;}
+}

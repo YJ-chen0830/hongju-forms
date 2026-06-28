@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>報價單生成器 · 儒鴻 / 宏儒</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  body{font-family:'Noto Sans TC',sans-serif;background:#E7E2D8;color:#322F27;}
+
+  /* ===== APP LAYOUT ===== */
+  .app{display:grid;grid-template-columns:380px 1fr;min-height:100vh;}
+  .panel{background:#F6F3EC;border-right:1px solid #DAD3C4;height:100vh;overflow-y:auto;position:sticky;top:0;}
+  .stage{padding:36px 28px 80px;overflow-x:auto;}
+
+  /* ===== PANEL ===== */
+  .p-head{padding:18px 20px;border-bottom:1px solid #DAD3C4;position:sticky;top:0;background:#F6F3EC;z-index:5;}
+  .p-back{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:#9A7B2A;text-decoration:none;font-weight:600;letter-spacing:0.04em;}
+  .p-title{font-weight:700;font-size:18px;color:#0A1A33;margin:8px 0 0;}
+  .p-sub{font-size:11.5px;color:#8C8576;margin-top:3px;}
+  .p-body{padding:6px 20px 40px;}
+  .sec{margin-top:20px;}
+  .sec-lbl{font-family:'Archivo',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.16em;color:#9A7B2A;text-transform:uppercase;margin-bottom:9px;display:flex;align-items:center;gap:8px;}
+  .sec-lbl::after{content:"";flex:1;height:1px;background:#E2DCCD;}
+  .field{margin-bottom:11px;}
+  .field label{display:block;font-size:11px;color:#6B6557;margin-bottom:4px;font-weight:500;}
+  .field input,.field select,.field textarea{width:100%;font-family:inherit;font-size:12.5px;color:#0A1A33;background:#fff;border:1px solid #D8D1C2;border-radius:5px;padding:7px 9px;outline:none;transition:border-color .15s,box-shadow .15s;}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:#C9A24A;box-shadow:0 0 0 3px rgba(201,162,74,0.16);}
+  .field textarea{resize:vertical;line-height:1.5;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px;}
+
+  /* toggle */
+  .toggle{display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid #D8D1C2;border-radius:5px;padding:8px 10px;}
+  .toggle span{font-size:12.5px;color:#0A1A33;}
+  .sw{width:40px;height:22px;border-radius:11px;background:#CDC6B6;position:relative;cursor:pointer;transition:background .18s;flex:none;}
+  .sw::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .18s;}
+  .sw.on{background:#0A1A33;}
+  .sw.on::after{transform:translateX(18px);}
+
+  /* items editor */
+  .item-row{background:#fff;border:1px solid #D8D1C2;border-radius:6px;padding:10px;margin-bottom:9px;position:relative;}
+  .item-row .ir-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
+  .item-row .ir-no{font-family:'Archivo',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.1em;color:#9A7B2A;}
+  .ir-del{border:none;background:none;color:#B24A4A;font-size:11px;cursor:pointer;padding:2px 4px;border-radius:4px;font-weight:600;}
+  .ir-del:hover{background:#FBEAEA;}
+  .item-row input{width:100%;font-family:inherit;font-size:12px;border:1px solid #E2DCCD;border-radius:4px;padding:5px 7px;margin-bottom:5px;outline:none;}
+  .item-row input:focus{border-color:#C9A24A;}
+  .ir-3{display:grid;grid-template-columns:1fr 1fr 1.3fr;gap:5px;}
+  .ir-3 input{margin-bottom:0;}
+  .ir-amt{text-align:right;font-size:11px;color:#6B6557;margin-top:6px;font-variant-numeric:tabular-nums;}
+  .ir-amt b{color:#0A1A33;}
+
+  /* buttons */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;font-size:12.5px;font-weight:600;border-radius:6px;padding:9px 14px;cursor:pointer;border:1px solid transparent;transition:all .15s;width:100%;}
+  .btn-ghost{background:#fff;border-color:#D8D1C2;color:#0A1A33;}
+  .btn-ghost:hover{border-color:#C9A24A;background:#FBF7EE;}
+  .btn-dark{background:#0A1A33;color:#fff;}
+  .btn-dark:hover{background:#16294a;}
+  .btn-gold{background:#C9A24A;color:#1c1403;}
+  .btn-gold:hover{background:#b8902f;}
+  .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+
+  /* saved list */
+  .saved-item{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E2DCCD;border-radius:5px;padding:7px 9px;margin-bottom:6px;}
+  .saved-item .si-name{flex:1;min-width:0;font-size:12px;color:#0A1A33;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .saved-item .si-meta{font-size:10px;color:#ADA796;}
+  .si-btn{border:none;background:none;cursor:pointer;font-size:11px;font-weight:600;padding:3px 6px;border-radius:4px;}
+  .si-load{color:#9A7B2A;}.si-load:hover{background:#FBF3E0;}
+  .si-del{color:#B24A4A;}.si-del:hover{background:#FBEAEA;}
+  .empty-note{font-size:11px;color:#ADA796;text-align:center;padding:10px;}
+
+  /* ===== A4 PREVIEW (mirrors the design system quotation) ===== */
+  .paper{width:210mm;min-height:297mm;margin:0 auto;background:#fff;box-shadow:0 22px 60px rgba(10,26,51,0.18);position:relative;overflow:hidden;}
+  .pad{padding:15mm 14mm 13mm;}
+  .topbar{position:absolute;top:0;left:0;right:0;height:4px;background:#C9A24A;}
+  .q-th{background:#0A1A33;color:#fff;font-weight:500;font-size:11.5px;letter-spacing:0.04em;padding:9px 10px;text-align:left;}
+  .q-td{padding:8px 10px;font-size:12px;color:#322F27;border-bottom:1px solid #E2DDD1;vertical-align:top;line-height:1.4;}
+  .q-row-alt{background:#FAF8F3;}
+  .q-num{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap;}
+
+  @media print{
+    @page{size:A4;margin:0;}
+    html,body{background:#fff !important;}
+    .panel,.stage-chrome{display:none !important;}
+    .app{display:block !important;}
+    .stage{padding:0 !important;overflow:visible !important;}
+    .paper{box-shadow:none !important;margin:0 !important;width:210mm !important;}
+  }
+
+  .stage-chrome{max-width:210mm;margin:0 auto 22px;display:flex;justify-content:space-between;align-items:flex-end;gap:16px;}
+  .sc-left .sc-kicker{font-family:'Archivo',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.2em;color:#9A7B2A;text-transform:uppercase;}
+  .sc-left .sc-name{font-weight:600;font-size:20px;color:#0A1A33;margin-top:5px;}
+  .hint{font-size:11px;color:#8C8576;margin-top:4px;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============ CONTROL PANEL ============ -->
+  <aside class="panel">
+    <div class="p-head">
+      <a class="p-back" href="index.html">← 返回表格中心</a>
+      <div class="p-title">報價單生成器</div>
+      <div class="p-sub">填寫 → 即時預覽 → 列印 / 存 PDF</div>
+    </div>
+    <div class="p-body">
+
+      <!-- 公司 / 稅 -->
+      <div class="sec">
+        <div class="sec-lbl">公司別與稅務</div>
+        <div class="field">
+          <label>抬頭公司</label>
+          <select id="f-brand">
+            <option value="儒鴻結構土木技師事務所">儒鴻結構土木技師事務所</option>
+            <option value="宏儒營造有限公司">宏儒營造有限公司</option>
+          </select>
+        </div>
+        <div class="field">
+          <div class="toggle">
+            <span>含 5% 營業稅</span>
+            <div class="sw" id="f-tax"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 報價資訊 -->
+      <div class="sec">
+        <div class="sec-lbl">報價資訊</div>
+        <div class="field"><label>報價單號</label><input id="f-quoteNo" type="text"></div>
+        <div class="grid2">
+          <div class="field"><label>報價日期</label><input id="f-quoteDate" type="text"></div>
+          <div class="field"><label>有效期限</label><input id="f-validUntil" type="text"></div>
+        </div>
+        <div class="field"><label>報價人員</label><input id="f-quoter" type="text"></div>
+      </div>
+
+      <!-- 業主 -->
+      <div class="sec">
+        <div class="sec-lbl">業主資料</div>
+        <div class="field"><label>業主名稱</label><input id="f-clientName" type="text"></div>
+        <div class="grid2">
+          <div class="field"><label>聯絡人</label><input id="f-clientContact" type="text"></div>
+          <div class="field"><label>聯絡電話</label><input id="f-clientPhone" type="text"></div>
+        </div>
+        <div class="field"><label>工程名稱</label><input id="f-projectName" type="text"></div>
+        <div class="field"><label>工程地點</label><input id="f-projectLocation" type="text"></div>
+      </div>
+
+      <!-- 報價項目 -->
+      <div class="sec">
+        <div class="sec-lbl">報價項目</div>
+        <div id="items-editor"></div>
+        <button class="btn btn-ghost" id="add-item">＋ 新增項目</button>
+      </div>
+
+      <!-- 報價說明 -->
+      <div class="sec">
+        <div class="sec-lbl">報價說明</div>
+        <div class="field">
+          <textarea id="f-terms" rows="7" placeholder="每行一條，留空行會自動忽略"></textarea>
+        </div>
+      </div>
+
+      <!-- 輸出 -->
+      <div class="sec">
+        <div class="sec-lbl">輸出</div>
+        <button class="btn btn-gold" id="btn-print" style="margin-bottom:8px;">🖨 列印 / 存成 PDF</button>
+        <div class="btn-row">
+          <button class="btn btn-dark" id="btn-save">💾 另存此份</button>
+          <button class="btn btn-ghost" id="btn-new">＋ 開新單</button>
+        </div>
+      </div>
+
+      <!-- 已儲存 -->
+      <div class="sec">
+        <div class="sec-lbl">已儲存報價單</div>
+        <div id="saved-list"></div>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- ============ PREVIEW ============ -->
+  <main class="stage">
+    <div class="stage-chrome">
+      <div class="sc-left">
+        <div class="sc-kicker">Quotation · 工程報價單</div>
+        <div class="sc-name" id="sc-name">儒鴻結構土木技師事務所　報價單</div>
+        <div class="hint">左側修改即時更新；自動記住上次內容，重新整理不會遺失。</div>
+      </div>
+    </div>
+    <div class="paper" id="paper"><!-- rendered by JS --></div>
+  </main>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- brand config ----------
+  var BRANDS = {
+    "儒鴻結構土木技師事務所": {
+      brandName:"儒鴻結構土木技師事務所",
+      brandEng:"JU HONG STRUCTURAL & CIVIL ENGINEER OFFICE",
+      brandEmail:"service@hongju.com.tw", taxId:"88760791", logoSrc:"assets/logo-j-mark.png"
+    },
+    "宏儒營造有限公司": {
+      brandName:"宏儒營造有限公司",
+      brandEng:"HONG JU CONSTRUCTION CO., LTD.",
+      brandEmail:"service@hongju.com.tw", taxId:"89795586", logoSrc:"assets/logo-h-mark.png"
+    }
+  };
+  var ADDR = "台中市豐原區南村路 19 號";
+  var TEL = "TEL 04-2520-5003　FAX 04-2520-6399";
+
+  var DEFAULT_TERMS = [
+    "一、本報價單有效期限為報價日起 30 日內，逾期請重新洽詢。",
+    "二、本報價未含業主自辦之申請規費、雜項及保險費用。",
+    "三、工程數量以實作實算為準，異動部分另行估驗計價。",
+    "四、付款條件：收到國震中心協審通過通知書後一次付清。",
+    "五、如蒙惠允承作，敬請於確認後簽章回傳，以利排程。"
+  ];
+
+  function defaultState(){
+    return {
+      brand:"儒鴻結構土木技師事務所",
+      showTax:false,
+      quoteNo:"QJ-1150623-01",
+      quoteDate:"2026 / 06 / 23",
+      validUntil:"2026 / 07 / 23",
+      quoter:"陳彥儒",
+      clientName:"台灣迪恩士先端科技股份有限公司",
+      clientContact:"陳先生",
+      clientPhone:"0920777953",
+      projectName:"SLIT COATER螺栓種類錨定方式補充資料",
+      projectLocation:"",
+      items:[ {name:"補充說明編纂(不含代墊之審查費)", spec:"含協助國震中心協審", unit:"式", qty:1, price:6000} ],
+      terms: DEFAULT_TERMS.slice()
+    };
+  }
+
+  // ---------- storage ----------
+  var LS_CUR = "hj_quotation_current";
+  var LS_SAVED = "hj_quotation_saved";
+  function loadCur(){ try{ var s=JSON.parse(localStorage.getItem(LS_CUR)); return s&&s.items?s:defaultState(); }catch(e){ return defaultState(); } }
+  function saveCur(){ try{ localStorage.setItem(LS_CUR, JSON.stringify(state)); }catch(e){} }
+  function loadSaved(){ try{ return JSON.parse(localStorage.getItem(LS_SAVED))||{}; }catch(e){ return {}; } }
+  function writeSaved(o){ try{ localStorage.setItem(LS_SAVED, JSON.stringify(o)); }catch(e){} }
+
+  var state = loadCur();
+
+  // ---------- helpers ----------
+  function fmt(n){ return Number(n||0).toLocaleString("en-US"); }
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];}); }
+
+  function cjk(n){
+    n = Math.round(Number(n)||0);
+    if(n===0) return "零";
+    var D=["零","壹","貳","參","肆","伍","陸","柒","捌","玖"], U=["","拾","佰","仟"], G=["","萬","億","兆"];
+    function groupStr(part){ var str="",pend=false,started=false;
+      for(var u=3;u>=0;u--){ var d=Math.floor(part/Math.pow(10,u))%10;
+        if(d===0){ if(started) pend=true; } else { if(pend){str+="零";pend=false;} str+=D[d]+U[u]; started=true; } }
+      return str; }
+    var groups=[], m=n; while(m>0){ groups.push(m%10000); m=Math.floor(m/10000); }
+    var s="";
+    for(var g=groups.length-1;g>=0;g--){ var part=groups[g]; if(part===0) continue;
+      if(s!=="" && part<1000) s+="零"; s+=groupStr(part)+G[g]; }
+    return s.replace(/零+/g,"零").replace(/零$/,"")||"零";
+  }
+
+  // ---------- render preview ----------
+  function render(){
+    var cfg = BRANDS[state.brand] || BRANDS["儒鴻結構土木技師事務所"];
+    var TARGET = 8;
+    var rows="", subtotal=0;
+    var count = Math.max(TARGET, state.items.length);
+    for(var i=0;i<count;i++){
+      var it = state.items[i];
+      var alt = (i%2===1) ? " q-row-alt" : "";
+      if(it){
+        var amt = (Number(it.qty)||0)*(Number(it.price)||0);
+        subtotal += amt;
+        rows += '<tr class="'+alt.trim()+'">'+
+          '<td class="q-td q-num" style="text-align:center;color:#8C8576;">'+(i+1)+'</td>'+
+          '<td class="q-td"><div style="font-weight:600;color:#0A1A33;">'+esc(it.name)+'</div>'+
+            (it.spec?'<div style="font-size:10.5px;color:#6B6557;margin-top:2px;">'+esc(it.spec)+'</div>':'')+'</td>'+
+          '<td class="q-td" style="text-align:center;color:#6B6557;">'+esc(it.unit)+'</td>'+
+          '<td class="q-td q-num">'+(it.qty!=null&&it.qty!==""?fmt(it.qty):"")+'</td>'+
+          '<td class="q-td q-num">'+(it.price!=null&&it.price!==""?fmt(it.price):"")+'</td>'+
+          '<td class="q-td q-num" style="font-weight:600;color:#0A1A33;">'+fmt(amt)+'</td>'+
+        '</tr>';
+      } else {
+        rows += '<tr class="'+alt.trim()+'"><td class="q-td q-num" style="text-align:center;color:#8C8576;">'+(i+1)+'</td><td class="q-td">&nbsp;</td><td class="q-td"></td><td class="q-td"></td><td class="q-td"></td><td class="q-td"></td></tr>';
+      }
+    }
+    var tax = state.showTax ? Math.round(subtotal*0.05) : 0;
+    var total = subtotal + tax;
+
+    var taxRow = state.showTax ?
+      '<div style="display:flex;justify-content:space-between;padding:6px 12px;font-size:12px;color:#322F27;border-top:1px solid #EFEBE2;"><span style="color:#6B6557;">營業稅 5%</span><span class="q-num">NT$ '+fmt(tax)+'</span></div>' : '';
+
+    var termsArr = (state.terms||[]).filter(function(t){return t&&t.trim();});
+    var termsHtml = termsArr.map(function(t){ return '<div>'+esc(t)+'</div>'; }).join("");
+
+    document.getElementById("sc-name").textContent = cfg.brandName + "　報價單";
+
+    document.getElementById("paper").innerHTML =
+    '<div class="topbar"></div>'+
+    '<div class="pad">'+
+
+      // header
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;padding-bottom:16px;border-bottom:1.5px solid #0A1A33;">'+
+        '<div style="display:flex;gap:13px;align-items:flex-start;min-width:0;">'+
+          '<img src="'+cfg.logoSrc+'" alt="logo" style="height:46px;width:auto;display:block;flex:none;margin-top:2px;">'+
+          '<div style="min-width:0;">'+
+            '<div style="font-weight:700;font-size:19px;color:#0A1A33;letter-spacing:0.01em;line-height:1.2;">'+esc(cfg.brandName)+'</div>'+
+            '<div style="font-family:Archivo,sans-serif;font-weight:600;font-size:8px;letter-spacing:0.06em;color:#8C8576;margin-top:3px;">'+esc(cfg.brandEng)+'</div>'+
+            '<div style="font-size:10.5px;color:#6B6557;line-height:1.7;margin-top:9px;">'+
+              '<div>'+ADDR+'</div><div>'+TEL+'</div>'+
+              '<div>統一編號 '+cfg.taxId+'　·　'+cfg.brandEmail+'</div>'+
+            '</div>'+
+          '</div>'+
+        '</div>'+
+        '<div style="flex:none;text-align:right;">'+
+          '<div style="font-family:\'Noto Serif TC\',serif;font-weight:600;font-size:34px;color:#0A1A33;letter-spacing:0.18em;padding-left:0.18em;">報價單</div>'+
+          '<div style="font-family:Archivo,sans-serif;font-size:9.5px;font-weight:600;letter-spacing:0.26em;color:#9A7B2A;text-transform:uppercase;margin-top:1px;">Quotation</div>'+
+          '<div style="display:inline-grid;grid-template-columns:auto auto;gap:5px 12px;margin-top:13px;font-size:11px;text-align:left;">'+
+            '<div style="color:#6B6557;">報價單號</div><div style="color:#322F27;font-weight:600;font-variant-numeric:tabular-nums;">'+esc(state.quoteNo)+'</div>'+
+            '<div style="color:#6B6557;">報價日期</div><div style="color:#322F27;font-weight:600;font-variant-numeric:tabular-nums;">'+esc(state.quoteDate)+'</div>'+
+            '<div style="color:#6B6557;">有效期限</div><div style="color:#322F27;font-weight:600;font-variant-numeric:tabular-nums;">'+esc(state.validUntil)+'</div>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+
+      // client/project
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 26px;margin-top:16px;padding:14px 16px;background:#F8F6F0;border:1px solid #E2DDD1;border-radius:4px;">'+
+        '<div style="display:grid;grid-template-columns:62px 1fr;row-gap:7px;font-size:11.5px;align-content:start;">'+
+          '<div style="color:#9A7B2A;font-weight:600;">業主</div><div style="color:#0A1A33;font-weight:600;">'+esc(state.clientName)+'</div>'+
+          '<div style="color:#9A7B2A;font-weight:600;">聯絡人</div><div style="color:#322F27;">'+esc(state.clientContact)+'</div>'+
+          '<div style="color:#9A7B2A;font-weight:600;">聯絡電話</div><div style="color:#322F27;">'+esc(state.clientPhone)+'</div>'+
+        '</div>'+
+        '<div style="display:grid;grid-template-columns:62px 1fr;row-gap:7px;font-size:11.5px;align-content:start;border-left:1px solid #E2DDD1;padding-left:24px;">'+
+          '<div style="color:#9A7B2A;font-weight:600;">工程名稱</div><div style="color:#0A1A33;font-weight:600;">'+esc(state.projectName)+'</div>'+
+          '<div style="color:#9A7B2A;font-weight:600;">工程地點</div><div style="color:#322F27;">'+esc(state.projectLocation)+'</div>'+
+          '<div style="color:#9A7B2A;font-weight:600;">報價人員</div><div style="color:#322F27;">'+esc(state.quoter)+'</div>'+
+        '</div>'+
+      '</div>'+
+
+      // items
+      '<table style="width:100%;border-collapse:collapse;margin-top:16px;table-layout:fixed;">'+
+        '<colgroup><col style="width:8%;"><col style="width:40%;"><col style="width:9%;"><col style="width:11%;"><col style="width:15%;"><col style="width:17%;"></colgroup>'+
+        '<thead><tr>'+
+          '<th class="q-th" style="text-align:center;border-radius:4px 0 0 0;">項次</th>'+
+          '<th class="q-th">品名 / 規格說明</th>'+
+          '<th class="q-th" style="text-align:center;">單位</th>'+
+          '<th class="q-th" style="text-align:right;">數量</th>'+
+          '<th class="q-th" style="text-align:right;">單價</th>'+
+          '<th class="q-th" style="text-align:right;border-radius:0 4px 0 0;">複價</th>'+
+        '</tr></thead><tbody>'+rows+'</tbody></table>'+
+
+      // totals
+      '<div style="display:flex;justify-content:flex-end;margin-top:14px;"><div style="width:54%;">'+
+        '<div style="display:flex;justify-content:space-between;padding:6px 12px;font-size:12px;color:#322F27;"><span style="color:#6B6557;">小計</span><span class="q-num">NT$ '+fmt(subtotal)+'</span></div>'+
+        taxRow+
+        '<div style="display:flex;justify-content:space-between;align-items:baseline;padding:10px 12px;margin-top:4px;background:#0A1A33;border-radius:4px;"><span style="color:#D9B96E;font-weight:600;font-size:13px;letter-spacing:0.04em;">總計 TOTAL</span><span class="q-num" style="color:#fff;font-weight:700;font-size:18px;">NT$ '+fmt(total)+'</span></div>'+
+      '</div></div>'+
+      '<div style="margin-top:9px;padding:7px 12px;border:1px solid #E2DDD1;border-left:3px solid #C9A24A;border-radius:3px;font-size:11.5px;color:#322F27;"><span style="color:#9A7B2A;font-weight:600;">總價金額（國字大寫）</span>　新臺幣 '+cjk(total)+' 元整</div>'+
+
+      // terms
+      (termsHtml ? '<div style="margin-top:18px;display:grid;grid-template-columns:1fr;gap:5px;"><div style="font-family:Archivo,sans-serif;font-size:10px;font-weight:600;letter-spacing:0.18em;color:#9A7B2A;text-transform:uppercase;margin-bottom:3px;">Terms · 報價說明</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:5px 24px;font-size:10.5px;color:#4B473C;line-height:1.65;">'+termsHtml+'</div></div>' : '')+
+
+      // sign
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px;">'+
+        '<div style="border:1px solid #E2DDD1;border-radius:4px;padding:11px 14px 14px;"><div style="font-size:11px;color:#9A7B2A;font-weight:600;margin-bottom:6px;">報價單位（簽章用印）</div><div style="font-size:12px;color:#0A1A33;font-weight:600;">'+esc(cfg.brandName)+'</div><div style="height:46px;"></div><div style="display:flex;gap:18px;font-size:10.5px;color:#6B6557;"><span>負責人：＿＿＿＿＿＿</span><span>報價人：'+esc(state.quoter)+'</span></div></div>'+
+        '<div style="border:1px solid #E2DDD1;border-radius:4px;padding:11px 14px 14px;"><div style="font-size:11px;color:#9A7B2A;font-weight:600;margin-bottom:6px;">業主確認（簽章用印）</div><div style="font-size:12px;color:#0A1A33;font-weight:600;">'+esc(state.clientName)+'</div><div style="height:46px;"></div><div style="display:flex;gap:18px;font-size:10.5px;color:#6B6557;"><span>簽認：＿＿＿＿＿＿</span><span>日期：＿＿＿／＿＿／＿＿</span></div></div>'+
+      '</div>'+
+
+      // footer
+      '<div style="margin-top:16px;padding-top:10px;border-top:1px solid #E2DDD1;display:flex;justify-content:space-between;align-items:center;"><div style="font-family:Archivo,sans-serif;font-size:8.5px;font-weight:600;letter-spacing:0.14em;color:#ADA796;text-transform:uppercase;">'+esc(cfg.brandEng)+'</div><div style="font-size:9.5px;color:#ADA796;letter-spacing:0.08em;">築基立信　·　感謝您的洽詢</div></div>'+
+
+    '</div>';
+  }
+
+  // ---------- items editor ----------
+  function renderItemsEditor(){
+    var box = document.getElementById("items-editor");
+    box.innerHTML = "";
+    state.items.forEach(function(it, idx){
+      var row = document.createElement("div");
+      row.className = "item-row";
+      var amt = (Number(it.qty)||0)*(Number(it.price)||0);
+      row.innerHTML =
+        '<div class="ir-top"><span class="ir-no">項次 '+(idx+1)+'</span><button class="ir-del" data-del="'+idx+'">✕ 刪除</button></div>'+
+        '<input data-f="name" data-i="'+idx+'" placeholder="品名" value="'+esc(it.name)+'">'+
+        '<input data-f="spec" data-i="'+idx+'" placeholder="規格說明（可留空）" value="'+esc(it.spec)+'">'+
+        '<div class="ir-3">'+
+          '<input data-f="unit" data-i="'+idx+'" placeholder="單位" value="'+esc(it.unit)+'">'+
+          '<input data-f="qty" data-i="'+idx+'" type="number" placeholder="數量" value="'+esc(it.qty)+'">'+
+          '<input data-f="price" data-i="'+idx+'" type="number" placeholder="單價" value="'+esc(it.price)+'">'+
+        '</div>'+
+        '<div class="ir-amt">複價 <b>NT$ '+fmt(amt)+'</b></div>';
+      box.appendChild(row);
+    });
+  }
+
+  // ---------- saved list ----------
+  function renderSavedList(){
+    var box = document.getElementById("saved-list");
+    var saved = loadSaved();
+    var names = Object.keys(saved);
+    if(!names.length){ box.innerHTML = '<div class="empty-note">尚無儲存的報價單</div>'; return; }
+    box.innerHTML = "";
+    names.sort(function(a,b){ return (saved[b]._ts||0)-(saved[a]._ts||0); });
+    names.forEach(function(name){
+      var rec = saved[name];
+      var d = rec._ts ? new Date(rec._ts) : null;
+      var meta = d ? (d.getMonth()+1)+"/"+d.getDate() : "";
+      var el = document.createElement("div");
+      el.className = "saved-item";
+      el.innerHTML = '<span class="si-name" title="'+esc(name)+'">'+esc(name)+'</span>'+
+        '<span class="si-meta">'+meta+'</span>'+
+        '<button class="si-btn si-load" data-load="'+esc(name)+'">載入</button>'+
+        '<button class="si-btn si-del" data-sdel="'+esc(name)+'">刪除</button>';
+      box.appendChild(el);
+    });
+  }
+
+  // ---------- sync form from state ----------
+  function fillForm(){
+    document.getElementById("f-brand").value = state.brand;
+    document.getElementById("f-tax").classList.toggle("on", !!state.showTax);
+    ["quoteNo","quoteDate","validUntil","quoter","clientName","clientContact","clientPhone","projectName","projectLocation"].forEach(function(k){
+      var el = document.getElementById("f-"+k); if(el) el.value = state[k]||"";
+    });
+    document.getElementById("f-terms").value = (state.terms||[]).join("\n");
+    renderItemsEditor();
+  }
+
+  function refresh(){ saveCur(); render(); }
+
+  // ---------- events ----------
+  function bind(){
+    // text/select fields
+    ["quoteNo","quoteDate","validUntil","quoter","clientName","clientContact","clientPhone","projectName","projectLocation"].forEach(function(k){
+      document.getElementById("f-"+k).addEventListener("input", function(e){ state[k]=e.target.value; refresh(); });
+    });
+    document.getElementById("f-brand").addEventListener("change", function(e){ state.brand=e.target.value; refresh(); });
+    document.getElementById("f-tax").addEventListener("click", function(){ state.showTax=!state.showTax; this.classList.toggle("on", state.showTax); refresh(); });
+    document.getElementById("f-terms").addEventListener("input", function(e){ state.terms = e.target.value.split("\n"); refresh(); });
+
+    // items editor (delegated)
+    var box = document.getElementById("items-editor");
+    box.addEventListener("input", function(e){
+      var t=e.target; if(!t.dataset.f) return;
+      var i=+t.dataset.i, f=t.dataset.f;
+      var v = (f==="qty"||f==="price") ? (t.value===""?"":Number(t.value)) : t.value;
+      state.items[i][f]=v;
+      // update only the amount label + preview, avoid full editor rebuild (keeps focus)
+      var amt=(Number(state.items[i].qty)||0)*(Number(state.items[i].price)||0);
+      var amtEl = t.closest(".item-row").querySelector(".ir-amt");
+      if(amtEl) amtEl.innerHTML='複價 <b>NT$ '+fmt(amt)+'</b>';
+      refresh();
+    });
+    box.addEventListener("click", function(e){
+      var del=e.target.dataset.del; if(del==null) return;
+      state.items.splice(+del,1);
+      if(!state.items.length) state.items.push({name:"",spec:"",unit:"式",qty:1,price:0});
+      renderItemsEditor(); refresh();
+    });
+    document.getElementById("add-item").addEventListener("click", function(){
+      state.items.push({name:"",spec:"",unit:"式",qty:1,price:0});
+      renderItemsEditor(); refresh();
+    });
+
+    // output
+    document.getElementById("btn-print").addEventListener("click", function(){ window.print(); });
+    document.getElementById("btn-new").addEventListener("click", function(){
+      if(!confirm("開新單會清空目前內容（已另存的不受影響），確定嗎？")) return;
+      state = defaultState(); state.items=[{name:"",spec:"",unit:"式",qty:1,price:0}]; state.quoteNo=""; state.projectName=""; state.clientName="";
+      fillForm(); refresh();
+    });
+    document.getElementById("btn-save").addEventListener("click", function(){
+      var sug = state.clientName ? (state.clientName+"｜"+(state.projectName||state.quoteNo)) : (state.quoteNo||"報價單");
+      var name = prompt("為這份報價單命名：", sug);
+      if(!name) return;
+      var saved=loadSaved();
+      var copy=JSON.parse(JSON.stringify(state)); copy._ts=Date.now();
+      saved[name]=copy; writeSaved(saved); renderSavedList();
+      alert("已儲存：「"+name+"」");
+    });
+
+    // saved list (delegated)
+    document.getElementById("saved-list").addEventListener("click", function(e){
+      var ld=e.target.dataset.load, dl=e.target.dataset.sdel;
+      if(ld!=null){
+        var saved=loadSaved(); var rec=saved[ld]; if(!rec) return;
+        state=JSON.parse(JSON.stringify(rec)); delete state._ts;
+        if(!state.terms) state.terms=DEFAULT_TERMS.slice();
+        fillForm(); refresh();
+      } else if(dl!=null){
+        if(!confirm("刪除「"+dl+"」？")) return;
+        var s=loadSaved(); delete s[dl]; writeSaved(s); renderSavedList();
+      }
+    });
+  }
+
+  // init
+  if(!state.terms) state.terms = DEFAULT_TERMS.slice();
+  fillForm(); bind(); render(); renderSavedList();
+})();
+</script>
+</body>
+</html>

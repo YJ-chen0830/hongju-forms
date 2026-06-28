@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>表格中心 · 儒鴻 / 宏儒</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  body{font-family:'Noto Sans TC',sans-serif;background:#EFEBE2;color:#322F27;min-height:100vh;}
+  .wrap{max-width:980px;margin:0 auto;padding:64px 28px 80px;}
+
+  .head{display:flex;align-items:flex-start;gap:16px;border-bottom:1.5px solid #0A1A33;padding-bottom:22px;}
+  .head img{height:52px;width:auto;display:block;margin-top:2px;}
+  .head .h-kicker{font-family:'Archivo',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.22em;color:#9A7B2A;text-transform:uppercase;}
+  .head .h-title{font-weight:700;font-size:30px;color:#0A1A33;letter-spacing:-0.01em;margin:8px 0 0;}
+  .head .h-sub{font-size:13px;color:#6B6557;margin-top:8px;line-height:1.6;}
+  .head .h-org{margin-left:auto;text-align:right;font-size:11px;color:#8C8576;line-height:1.7;flex:none;}
+
+  .sec-lbl{font-family:'Archivo',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.16em;color:#9A7B2A;text-transform:uppercase;margin:40px 0 16px;display:flex;align-items:center;gap:10px;}
+  .sec-lbl::after{content:"";flex:1;height:1px;background:#DAD3C4;}
+
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+  .card{display:block;text-decoration:none;color:inherit;background:#fff;border:1px solid #E2DDD1;border-radius:10px;padding:22px 22px 20px;position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s,border-color .15s;}
+  .card::before{content:"";position:absolute;top:0;left:0;width:4px;height:100%;background:#C9A24A;opacity:0;transition:opacity .15s;}
+  .card.ready{cursor:pointer;}
+  .card.ready:hover{transform:translateY(-3px);box-shadow:0 16px 34px rgba(10,26,51,0.13);border-color:#C9A24A;}
+  .card.ready:hover::before{opacity:1;}
+  .card.soon{opacity:.62;}
+  .c-ico{width:46px;height:46px;border-radius:9px;background:#0A1A33;color:#D9B96E;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px;}
+  .card.soon .c-ico{background:#CDC6B6;color:#fff;}
+  .c-name{font-weight:700;font-size:18px;color:#0A1A33;}
+  .c-en{font-family:'Archivo',sans-serif;font-size:9.5px;font-weight:600;letter-spacing:0.14em;color:#9A7B2A;text-transform:uppercase;margin-top:3px;}
+  .c-desc{font-size:12.5px;color:#6B6557;margin-top:11px;line-height:1.6;}
+  .c-foot{margin-top:16px;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;}
+  .tag{font-size:10px;font-weight:700;letter-spacing:0.08em;padding:3px 9px;border-radius:20px;}
+  .tag-ready{background:#0A1A33;color:#D9B96E;}
+  .tag-soon{background:#E7E1D3;color:#998F77;}
+  .go{color:#9A7B2A;}
+
+  .backup{display:flex;align-items:flex-start;gap:22px;background:#fff;border:1px solid #E2DDD1;border-left:4px solid #C9A24A;border-radius:10px;padding:22px 24px;}
+  .backup-txt{flex:1;min-width:0;}
+  .backup-h{font-weight:700;font-size:15px;color:#0A1A33;}
+  .backup-p{font-size:12.5px;color:#6B6557;line-height:1.7;margin-top:8px;}
+  .backup-stat{font-size:11.5px;color:#9A7B2A;font-weight:600;margin-top:11px;}
+  .backup-btns{flex:none;display:flex;flex-direction:column;gap:9px;width:148px;}
+  .bk-btn{font-family:inherit;font-size:13px;font-weight:600;border-radius:7px;padding:11px 14px;cursor:pointer;border:1px solid transparent;transition:all .15s;}
+  .bk-dark{background:#0A1A33;color:#fff;}.bk-dark:hover{background:#16294a;}
+  .bk-ghost{background:#fff;border-color:#D8D1C2;color:#0A1A33;}.bk-ghost:hover{border-color:#C9A24A;background:#FBF7EE;}
+  @media(max-width:640px){.backup{flex-direction:column;}.backup-btns{width:100%;flex-direction:row;}}
+  .foot{margin-top:48px;text-align:center;font-size:11px;color:#ADA796;letter-spacing:0.06em;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <img src="assets/logo-j-mark.png" alt="logo">
+    <div>
+      <div class="h-kicker">Form Center · 表格中心</div>
+      <div class="h-title">公司表格中心</div>
+      <div class="h-sub">所有公司常用表格集中於此　·　線上填寫、自動計算、列印或存成 PDF</div>
+    </div>
+    <div class="h-org">
+      儒鴻結構土木技師事務所<br>
+      宏儒營造有限公司<br>
+      台中市豐原區南村路 19 號
+    </div>
+  </div>
+
+  <div class="sec-lbl">可用表格</div>
+  <div class="grid">
+    <a class="card ready" href="quotation.html">
+      <div class="c-ico">📋</div>
+      <div class="c-name">報價單</div>
+      <div class="c-en">Quotation</div>
+      <div class="c-desc">工程報價明細，含稅額、總計、國字大寫自動計算，可存多份並命名管理。</div>
+      <div class="c-foot"><span class="tag tag-ready">可使用</span><span class="go">開始填寫 →</span></div>
+    </a>
+    <a class="card ready" href="estimate.html">
+      <div class="c-ico">🧾</div>
+      <div class="c-name">估價單 / 請款單</div>
+      <div class="c-en">Estimate / Invoice</div>
+      <div class="c-desc">一鍵切換估價單與請款單，請款模式含已收扣抵與匯款資訊，金額自動計算。</div>
+      <div class="c-foot"><span class="tag tag-ready">可使用</span><span class="go">開始填寫 →</span></div>
+    </a>
+    <a class="card ready" href="receipt.html">
+      <div class="c-ico">💵</div>
+      <div class="c-name">收據</div>
+      <div class="c-en">Receipt</div>
+      <div class="c-desc">收款收據，金額國字大寫自動換算，含付款方式、事由與用印欄。</div>
+      <div class="c-foot"><span class="tag tag-ready">可使用</span><span class="go">開始填寫 →</span></div>
+    </a>
+    <a class="card ready" href="contract.html">
+      <div class="c-ico">📄</div>
+      <div class="c-name">工程合約</div>
+      <div class="c-en">Contract</div>
+      <div class="c-desc">工程承攬合約書，內建標準條款可增刪排序，內容過長自動分頁列印。</div>
+      <div class="c-foot"><span class="tag tag-ready">可使用</span><span class="go">開始填寫 →</span></div>
+    </a>
+    <a class="card ready" href="business-card.html">
+      <div class="c-ico">🪪</div>
+      <div class="c-name">名片</div>
+      <div class="c-en">Business Card</div>
+      <div class="c-desc">儒鴻、宏儒雙公司四面名片，填姓名職稱即時套版，每面分頁列印（90×54mm）。</div>
+      <div class="c-foot"><span class="tag tag-ready">可使用</span><span class="go">開始填寫 →</span></div>
+    </a>
+  </div>
+
+  <div class="sec-lbl">備份與還原</div>
+  <div class="backup">
+    <div class="backup-txt">
+      <div class="backup-h">把所有表格資料搬到別台電腦 / 瀏覽器</div>
+      <div class="backup-p">資料只存在目前這個瀏覽器。在這裡「匯出備份」成一個檔案，到另一台電腦的同一頁面「匯入備份」，所有已儲存的報價單、估價單、收據、合約、名片就會一起帶過去。建議定期備份，以免清除瀏覽器資料時遺失。</div>
+      <div id="backup-stat" class="backup-stat"></div>
+    </div>
+    <div class="backup-btns">
+      <button class="bk-btn bk-dark" id="btn-export">⬇ 匯出備份</button>
+      <button class="bk-btn bk-ghost" id="btn-import">⬆ 匯入備份</button>
+      <input type="file" id="import-file" accept="application/json,.json" style="display:none;">
+    </div>
+  </div>
+
+  <div class="foot">築基立信　·　HONG JU CONSTRUCTION</div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+  // 所有表格使用的 localStorage 鍵
+  var KEYS = [
+    "hj_quotation_current","hj_quotation_saved",
+    "hj_estimate_current","hj_estimate_saved",
+    "hj_receipt_current","hj_receipt_saved",
+    "hj_contract_current","hj_contract_saved",
+    "hj_card_current","hj_card_saved"
+  ];
+  var LABELS = {hj_quotation_saved:"報價單",hj_estimate_saved:"估價單/請款單",hj_receipt_saved:"收據",hj_contract_saved:"合約",hj_card_saved:"名片"};
+
+  function countSaved(){
+    var parts=[];
+    Object.keys(LABELS).forEach(function(k){
+      try{ var o=JSON.parse(localStorage.getItem(k))||{}; var n=Object.keys(o).length; if(n) parts.push(LABELS[k]+" "+n+" 份"); }catch(e){}
+    });
+    return parts;
+  }
+  function refreshStat(){
+    var parts=countSaved();
+    document.getElementById("backup-stat").textContent = parts.length ? ("目前已儲存："+parts.join("　·　")) : "目前尚無已儲存的表格。";
+  }
+
+  document.getElementById("btn-export").addEventListener("click",function(){
+    var data={ _app:"hongju-form-center", _ver:1, _exportedAt:new Date().toISOString(), store:{} };
+    KEYS.forEach(function(k){ var v=localStorage.getItem(k); if(v!=null) data.store[k]=v; });
+    var blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+    var url=URL.createObjectURL(blob);
+    var d=new Date(), pad=function(n){return (n<10?"0":"")+n;};
+    var fname="儒鴻表格備份_"+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+".json";
+    var a=document.createElement("a"); a.href=url; a.download=fname; document.body.appendChild(a); a.click();
+    setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); },100);
+  });
+
+  document.getElementById("btn-import").addEventListener("click",function(){ document.getElementById("import-file").click(); });
+  document.getElementById("import-file").addEventListener("change",function(e){
+    var file=e.target.files&&e.target.files[0]; if(!file) return;
+    var reader=new FileReader();
+    reader.onload=function(){
+      var data; try{ data=JSON.parse(reader.result); }catch(err){ alert("檔案格式不正確，無法匯入。"); return; }
+      if(!data||data._app!=="hongju-form-center"||!data.store){ alert("這不是有效的儒鴻表格備份檔。"); return; }
+      if(!confirm("匯入會以備份檔的內容覆蓋目前這個瀏覽器的表格資料，確定嗎？")) { e.target.value=""; return; }
+      KEYS.forEach(function(k){ if(data.store[k]!=null) localStorage.setItem(k, data.store[k]); });
+      e.target.value=""; refreshStat();
+      alert("匯入完成！所有表格資料已還原至此瀏覽器。");
+    };
+    reader.readAsText(file);
+  });
+
+  refreshStat();
+})();
+</script>
+</body>
+</html>
