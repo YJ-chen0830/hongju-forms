@@ -7,13 +7,13 @@
       brandName:"儒鴻結構土木技師事務所",
       brandEng:"JU HONG STRUCTURAL & CIVIL ENGINEER OFFICE",
       brandEmail:"service@hongju.com.tw", taxId:"88760791",
-      logoSrc:"assets/logo-j-mark.png", logoLight:"assets/logo-j-mark-light.png"
+      logoSrc:"logo-j-mark.png", logoLight:"logo-j-mark-light.png"
     },
     "宏儒營造有限公司": {
       brandName:"宏儒營造有限公司",
       brandEng:"HONG JU CONSTRUCTION CO., LTD.",
       brandEmail:"service@hongju.com.tw", taxId:"89795586",
-      logoSrc:"assets/logo-h-mark.png", logoLight:"assets/logo-h-mark-light.png"
+      logoSrc:"logo-h-mark.png", logoLight:"logo-h-mark-light.png"
     }
   };
   var ADDR = "台中市豐原區南村路 19 號";
