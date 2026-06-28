@@ -72,11 +72,22 @@ body{font-family:'Noto Sans TC',sans-serif;background:#E7E2D8;color:#322F27;}
 .sc-left .sc-name{font-weight:600;font-size:20px;color:#0A1A33;margin-top:5px;}
 .hint{font-size:11px;color:#8C8576;margin-top:4px;}
 
+@media(max-width:860px){
+  .app{grid-template-columns:1fr;}
+  .panel{position:static;height:auto;max-height:none;overflow:visible;border-right:none;border-bottom:1px solid #DAD3C4;}
+  .p-head{position:static;}
+  .stage{padding:18px 12px 64px;overflow-x:auto;}
+  .stage-chrome{max-width:none;flex-wrap:wrap;}
+  .paper{width:100%;min-width:0;min-height:auto;}
+  .pad{padding:24px 18px;}
+}
+
 @media print{
   @page{size:A4;margin:0;}
   html,body{background:#fff !important;}
   .panel,.stage-chrome{display:none !important;}
   .app{display:block !important;}
   .stage{padding:0 !important;overflow:visible !important;}
-  .paper{box-shadow:none !important;margin:0 !important;width:210mm !important;}
+  .paper{box-shadow:none !important;margin:0 !important;width:210mm !important;min-height:297mm !important;}
+  .pad{padding:15mm 14mm 13mm !important;}
 }
