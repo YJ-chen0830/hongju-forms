@@ -57,3 +57,37 @@
 
   global.HJ = { BRANDS:BRANDS, ADDR:ADDR, TEL:TEL, PHONE:PHONE, FAX:FAX, fmt:fmt, esc:esc, cjk:cjk, makeStore:makeStore };
 })(window);
+
+/* 手機版：編輯 / 預覽 切換列（套用所有表格頁） */
+(function(){
+  function init(){
+    if(!document.querySelector(".app") || !document.querySelector(".panel") || !document.querySelector(".stage")) return;
+    if(document.querySelector(".mtabs")) return;
+    var mq = window.matchMedia("(max-width:860px)");
+    var bar = document.createElement("div");
+    bar.className = "mtabs";
+    bar.innerHTML = '<button type="button" data-m="edit">\u270F\uFE0F \u7DE8\u8F2F</button><button type="button" data-m="preview">\u{1F4C4} \u9810\u89BD</button>';
+    document.body.appendChild(bar);
+    function setMode(m){
+      document.body.classList.toggle("m-edit", m==="edit");
+      document.body.classList.toggle("m-preview", m==="preview");
+      var btns = bar.querySelectorAll("button");
+      for(var i=0;i<btns.length;i++){ btns[i].classList.toggle("on", btns[i].getAttribute("data-m")===m); }
+      window.scrollTo(0,0);
+    }
+    bar.addEventListener("click", function(e){
+      var b = e.target.closest ? e.target.closest("button") : null;
+      if(b) setMode(b.getAttribute("data-m"));
+    });
+    function apply(){
+      if(mq.matches){
+        if(!document.body.classList.contains("m-edit") && !document.body.classList.contains("m-preview")) setMode("edit");
+      } else {
+        document.body.classList.remove("m-edit","m-preview");
+      }
+    }
+    apply();
+    if(mq.addEventListener) mq.addEventListener("change", apply); else if(mq.addListener) mq.addListener(apply);
+  }
+  if(document.readyState!=="loading") init(); else document.addEventListener("DOMContentLoaded", init);
+})();
