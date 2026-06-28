@@ -35,18 +35,25 @@
       <div class="sec">
         <div class="sec-lbl">立約方</div>
         <div class="field">
-          <label>乙方（承攬單位）</label>
+          <label>合約類型 / 我方角色</label>
+          <select id="f-ourRole">
+            <option value="B">承攬業主發包之工程（我方為乙方）</option>
+            <option value="A">發包工程予下包商（我方為甲方）</option>
+          </select>
+        </div>
+        <div class="field">
+          <label id="lbl-brand">我方公司（乙方 / 承攬單位）</label>
           <select id="f-brand">
             <option value="儒鴻結構土木技師事務所">儒鴻結構土木技師事務所</option>
             <option value="宏儒營造有限公司">宏儒營造有限公司</option>
           </select>
         </div>
-        <div class="field"><label>甲方（業主）名稱</label><input id="f-partyA" type="text"></div>
+        <div class="field"><label id="lbl-counterName">甲方（業主）名稱</label><input id="f-partyA" type="text"></div>
         <div class="grid2">
-          <div class="field"><label>甲方代表人</label><input id="f-partyARep" type="text"></div>
-          <div class="field"><label>甲方統一編號</label><input id="f-partyATax" type="text"></div>
+          <div class="field"><label id="lbl-counterRep">甲方代表人</label><input id="f-partyARep" type="text"></div>
+          <div class="field"><label id="lbl-counterTax">甲方統一編號</label><input id="f-partyATax" type="text"></div>
         </div>
-        <div class="field"><label>甲方地址</label><input id="f-partyAAddr" type="text"></div>
+        <div class="field"><label id="lbl-counterAddr">甲方地址</label><input id="f-partyAAddr" type="text"></div>
       </div>
 
       <div class="sec">
@@ -121,6 +128,7 @@
   function defaultState(){
     return {
       brand:"儒鴻結構土木技師事務所",
+      ourRole:"B",
       partyA:"", partyARep:"", partyATax:"", partyAAddr:"",
       cNo:"CJ-1150623-01", projectName:"", projectLocation:"",
       amount:0, showTax:false,
@@ -142,6 +150,26 @@
     var base = Number(state.amount)||0;
     var total = state.showTax ? Math.round(base*1.05) : base;
     document.getElementById("sc-name").textContent = cfg.brandName+"　工程合約書";
+
+    var ourIsA = state.ourRole === "A";
+    var ourP = { name: cfg.brandName, rep:"", tax: cfg.taxId, addr: H.ADDR+"　"+H.TEL, ours:true };
+    var cntP = { name: state.partyA, rep: state.partyARep, tax: state.partyATax, addr: state.partyAAddr, ours:false };
+    var pA = ourIsA ? ourP : cntP, pB = ourIsA ? cntP : ourP;
+    function pRows(label,p){
+      var nm = p.ours ? H.esc(p.name) : (H.esc(p.name)||"＿＿＿＿＿＿＿＿");
+      return '<span style="color:#9A7B2A;font-weight:600;">'+label+'</span>'+
+        '<span style="color:#0A1A33;font-weight:600;">'+nm+(p.rep?'　（代表人：'+H.esc(p.rep)+'）':'')+(p.tax?'　統編 '+H.esc(p.tax):'')+'</span>'+
+        (p.addr?'<span style="color:#9A7B2A;"></span><span style="color:#6B6557;font-size:10.5px;">'+H.esc(p.addr)+'</span>':'');
+    }
+    var partyRows = pRows("甲方",pA)+pRows("乙方",pB);
+    function sigBox(label,p){
+      return '<div style="border:1px solid #E2DDD1;border-radius:4px;padding:13px 16px 16px;">'+
+        '<div style="font-size:11px;color:#9A7B2A;font-weight:600;margin-bottom:8px;">'+label+'</div>'+
+        '<div style="font-size:12.5px;color:#0A1A33;font-weight:700;">'+(p.ours?H.esc(p.name):(H.esc(p.name)||"　"))+'</div>'+
+        '<div style="font-size:10.5px;color:#6B6557;margin-top:4px;">代表人：'+(H.esc(p.rep)||"＿＿＿＿＿")+'</div>'+
+        '<div style="height:50px;"></div></div>';
+    }
+    var sigA = sigBox("甲方（簽章用印）",pA), sigB = sigBox("乙方（簽章用印）",pB);
 
     var artsHtml = (state.arts||[]).filter(function(a){return (a.title&&a.title.trim())||(a.body&&a.body.trim());}).map(function(a,idx){
       return '<div style="margin-bottom:13px;break-inside:avoid;">'+
@@ -169,12 +197,7 @@
       // parties
       '<div style="font-size:11.5px;color:#3A372E;line-height:1.9;padding:13px 16px;background:#F8F6F0;border:1px solid #E2DDD1;border-radius:4px;">'+
         '立合約書人：'+
-        '<div style="display:grid;grid-template-columns:48px 1fr;gap:4px 10px;margin-top:6px;">'+
-          '<span style="color:#9A7B2A;font-weight:600;">甲方</span><span style="color:#0A1A33;font-weight:600;">'+(H.esc(state.partyA)||"＿＿＿＿＿＿＿＿")+'　'+(state.partyARep?'（代表人：'+H.esc(state.partyARep)+'）':'')+(state.partyATax?'　統編 '+H.esc(state.partyATax):'')+'</span>'+
-          (state.partyAAddr?'<span style="color:#9A7B2A;"></span><span style="color:#6B6557;font-size:10.5px;">'+H.esc(state.partyAAddr)+'</span>':'')+
-          '<span style="color:#9A7B2A;font-weight:600;">乙方</span><span style="color:#0A1A33;font-weight:600;">'+H.esc(cfg.brandName)+'　統編 '+cfg.taxId+'</span>'+
-          '<span style="color:#9A7B2A;"></span><span style="color:#6B6557;font-size:10.5px;">'+H.ADDR+'　'+H.TEL+'</span>'+
-        '</div>'+
+        '<div style="display:grid;grid-template-columns:48px 1fr;gap:4px 10px;margin-top:6px;">'+partyRows+'</div>'+
         '<div style="margin-top:8px;">茲就「<b style="color:#0A1A33;">'+(H.esc(state.projectName)||"＿＿＿＿＿＿")+'</b>」工程，雙方同意訂立本合約，條款如下：</div>'+
       '</div>'+
 
@@ -198,20 +221,7 @@
       // signatures
       '<div style="margin-top:24px;break-inside:avoid;">'+
         '<div style="font-family:Archivo,sans-serif;font-size:10px;font-weight:600;letter-spacing:0.16em;color:#9A7B2A;text-transform:uppercase;margin-bottom:12px;">Signatures · 立約簽署</div>'+
-        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">'+
-          '<div style="border:1px solid #E2DDD1;border-radius:4px;padding:13px 16px 16px;">'+
-            '<div style="font-size:11px;color:#9A7B2A;font-weight:600;margin-bottom:8px;">甲方（簽章用印）</div>'+
-            '<div style="font-size:12.5px;color:#0A1A33;font-weight:700;">'+(H.esc(state.partyA)||"　")+'</div>'+
-            '<div style="font-size:10.5px;color:#6B6557;margin-top:4px;">代表人：'+(H.esc(state.partyARep)||"＿＿＿＿＿")+'</div>'+
-            '<div style="height:50px;"></div>'+
-          '</div>'+
-          '<div style="border:1px solid #E2DDD1;border-radius:4px;padding:13px 16px 16px;">'+
-            '<div style="font-size:11px;color:#9A7B2A;font-weight:600;margin-bottom:8px;">乙方（簽章用印）</div>'+
-            '<div style="font-size:12.5px;color:#0A1A33;font-weight:700;">'+H.esc(cfg.brandName)+'</div>'+
-            '<div style="font-size:10.5px;color:#6B6557;margin-top:4px;">代表人：＿＿＿＿＿</div>'+
-            '<div style="height:50px;"></div>'+
-          '</div>'+
-        '</div>'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">'+sigA+sigB+'</div>'+
         '<div style="text-align:center;margin-top:16px;font-size:12px;color:#322F27;">中　華　民　國　'+H.esc(state.signDate)+'</div>'+
       '</div>'+
 
@@ -242,7 +252,18 @@
     });
   }
 
+  function applyRoleLabels(){
+    var weA = state.ourRole==="A";
+    document.getElementById("lbl-brand").textContent = weA ? "我方公司（甲方 / 發包單位）" : "我方公司（乙方 / 承攬單位）";
+    document.getElementById("lbl-counterName").textContent = weA ? "乙方（下包商）名稱" : "甲方（業主）名稱";
+    document.getElementById("lbl-counterRep").textContent = weA ? "乙方代表人" : "甲方代表人";
+    document.getElementById("lbl-counterTax").textContent = weA ? "乙方統一編號" : "甲方統一編號";
+    document.getElementById("lbl-counterAddr").textContent = weA ? "乙方地址" : "甲方地址";
+  }
+
   function fillForm(){
+    document.getElementById("f-ourRole").value=state.ourRole||"B";
+    applyRoleLabels();
     document.getElementById("f-brand").value=state.brand;
     document.getElementById("f-tax").classList.toggle("on",!!state.showTax);
     ["partyA","partyARep","partyATax","partyAAddr","cNo","projectName","projectLocation","amount","startDate","endDate","signDate"].forEach(function(k){
@@ -257,6 +278,7 @@
     });
     document.getElementById("f-amount").addEventListener("input",function(e){ state.amount=e.target.value===""?0:Number(e.target.value); refresh(); });
     document.getElementById("f-brand").addEventListener("change",function(e){ state.brand=e.target.value; refresh(); });
+    document.getElementById("f-ourRole").addEventListener("change",function(e){ state.ourRole=e.target.value; applyRoleLabels(); refresh(); });
     document.getElementById("f-tax").addEventListener("click",function(){ state.showTax=!state.showTax; this.classList.toggle("on",state.showTax); refresh(); });
 
     var box=document.getElementById("art-editor");
