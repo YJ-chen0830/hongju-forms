@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>員工到職／人事資料表 · 宏儒營造</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/*hide-chrome*/ .f-chrome{display:none !important;}
+  *{box-sizing:border-box;}
+  body{margin:0;}
+  .f-stage{min-height:100vh;background:#EFEBE2;padding:40px 28px 64px;font-family:'Noto Sans TC',sans-serif;}
+  .f-paper{width:210mm;min-height:297mm;margin:0 auto;background:#fff;box-shadow:0 22px 60px rgba(10,26,51,0.18);position:relative;overflow:hidden;}
+  .f-pad{padding:11mm 14mm 10mm;}
+  .f-sect{display:flex;align-items:center;gap:8px;margin:9px 0 5px;}
+  .f-sect .bar{width:3px;height:13px;background:#C9A24A;}
+  .f-sect .zh{font-size:12.5px;font-weight:700;color:#0A1A33;}
+  .f-sect .en{font-family:'Archivo',sans-serif;font-size:8.5px;font-weight:600;letter-spacing:0.16em;color:#9A7B2A;text-transform:uppercase;}
+  .f-grid{display:grid;border:1px solid #D8D2C4;border-radius:4px;overflow:hidden;}
+  .f-lbl{background:#F8F6F0;padding:8px 10px;font-size:10.5px;color:#4B473C;font-weight:600;border-bottom:1px solid #E2DDD1;border-right:1px solid #E2DDD1;display:flex;align-items:center;}
+  .f-val{padding:6px 10px;font-size:11px;color:#0A1A33;border-bottom:1px solid #E2DDD1;border-right:1px solid #E2DDD1;min-height:27px;display:flex;align-items:center;}
+  .f-last .f-lbl,.f-last .f-val{border-bottom:none;}
+  @media print{
+    @page{size:A4;margin:0;}
+    html,body{background:#fff !important;}
+    .f-stage{padding:0 !important;background:#fff !important;min-height:0 !important;}
+    .f-chrome{display:none !important;}
+    .f-paper{box-shadow:none !important;width:210mm !important;min-height:297mm !important;margin:0 !important;page-break-after:always;}
+  }
+
+@media print{*{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;}}
+</style>
+</head>
+<body>
+<div class="f-stage">
+
+  <div class="f-chrome" style="max-width:210mm;margin:0 auto 26px;">
+    <div style="width:44px;height:2px;background:#C9A24A;margin-bottom:14px;"></div>
+    <div style="font-family:'Archivo',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.22em;color:#9A7B2A;text-transform:uppercase;">Employee Data Form · 人事資料表</div>
+    <div style="font-weight:600;font-size:26px;color:#0A1A33;letter-spacing:-0.01em;margin:9px 0 0;">宏儒營造　員工到職／人事資料表</div>
+    <div style="font-size:12.5px;color:#6B6557;margin-top:8px;line-height:1.6;">A4 直式　·　由新進同仁填寫　·　列印或另存 PDF 時自動套用 A4 版面</div>
+  </div>
+
+  <div class="f-paper">
+    <div style="position:absolute;top:0;left:0;right:0;height:4px;background:#C9A24A;"></div>
+    <div class="f-pad">
+
+      <!-- HEADER -->
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:18px;padding-bottom:12px;border-bottom:1.5px solid #0A1A33;">
+        <div style="display:flex;gap:12px;align-items:flex-start;min-width:0;">
+          <img src="logo-h-mark.png" alt="logo" style="height:42px;width:auto;display:block;flex:none;margin-top:2px;">
+          <div style="min-width:0;">
+            <div style="font-weight:700;font-size:18px;color:#0A1A33;line-height:1.2;">宏儒營造有限公司</div>
+            <div style="font-family:'Archivo',sans-serif;font-weight:600;font-size:7.5px;letter-spacing:0.06em;color:#8C8576;margin-top:2px;">HONG JU CONSTRUCTION CO., LTD.</div>
+            <div style="font-size:10px;color:#6B6557;margin-top:5px;">台中市豐原區南村路 19 號　·　統一編號 89795586</div>
+          </div>
+        </div>
+        <div style="flex:none;text-align:right;">
+          <div style="font-family:'Noto Serif TC',serif;font-weight:600;font-size:24px;color:#0A1A33;letter-spacing:0.1em;">人事資料表</div>
+          <div style="font-size:10px;color:#6B6557;margin-top:6px;">填表日期：＿＿＿／＿＿／＿＿　員工編號：＿＿＿＿</div>
+        </div>
+      </div>
+
+      <!-- BASIC + PHOTO -->
+      <div style="display:grid;grid-template-columns:1fr 86px;gap:12px;margin-top:6px;">
+        <div>
+          <div class="f-sect"><span class="bar"></span><span class="zh">基本資料</span><span class="en">Personal</span></div>
+          <div class="f-grid" style="grid-template-columns:78px 1fr 78px 1fr;">
+            <div class="f-lbl">姓名</div><div class="f-val"></div>
+            <div class="f-lbl">性別</div><div class="f-val">□ 男　□ 女</div>
+            <div class="f-lbl">身分證字號</div><div class="f-val"></div>
+            <div class="f-lbl">出生日期</div><div class="f-val">　　／　　／　　</div>
+            <div class="f-lbl f-last">籍貫／國籍</div><div class="f-val f-last"></div>
+            <div class="f-lbl f-last">婚姻狀況</div><div class="f-val f-last">□ 未婚　□ 已婚</div>
+          </div>
+        </div>
+        <div style="border:1px dashed #B9B2A1;border-radius:4px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:9px;color:#9A937F;line-height:1.5;padding:6px;min-height:118px;">
+          二吋<br>照片<br>黏貼處
+        </div>
+      </div>
+
+      <!-- CONTACT -->
+      <div class="f-sect"><span class="bar"></span><span class="zh">聯絡資料</span><span class="en">Contact</span></div>
+      <div class="f-grid" style="grid-template-columns:78px 1fr 78px 1fr;">
+        <div class="f-lbl">行動電話</div><div class="f-val"></div>
+        <div class="f-lbl">電子郵件</div><div class="f-val"></div>
+        <div class="f-lbl">戶籍地址</div><div class="f-val" style="border-right:none;grid-column:span 3;"></div>
+        <div class="f-lbl f-last">通訊地址</div><div class="f-val f-last" style="border-right:none;grid-column:span 3;">□ 同戶籍地址</div>
+      </div>
+
+      <!-- EMERGENCY -->
+      <div class="f-sect"><span class="bar"></span><span class="zh">緊急聯絡人</span><span class="en">Emergency Contact</span></div>
+      <div class="f-grid" style="grid-template-columns:78px 1fr 78px 1fr 78px 1fr;">
+        <div class="f-lbl">姓名（一）</div><div class="f-val"></div>
+        <div class="f-lbl">關係</div><div class="f-val"></div>
+        <div class="f-lbl">聯絡電話</div><div class="f-val"></div>
+        <div class="f-lbl f-last">姓名（二）</div><div class="f-val f-last"></div>
+        <div class="f-lbl f-last">關係</div><div class="f-val f-last"></div>
+        <div class="f-lbl f-last">聯絡電話</div><div class="f-val f-last"></div>
+      </div>
+
+      <!-- EDU + MILITARY -->
+      <div class="f-sect"><span class="bar"></span><span class="zh">學歷與兵役</span><span class="en">Education & Military</span></div>
+      <div class="f-grid" style="grid-template-columns:78px 1fr 78px 1fr;">
+        <div class="f-lbl">最高學歷</div><div class="f-val"></div>
+        <div class="f-lbl">畢業學校</div><div class="f-val"></div>
+        <div class="f-lbl">科系</div><div class="f-val"></div>
+        <div class="f-lbl">兵役狀況</div><div class="f-val">□ 役畢　□ 未役　□ 免役</div>
+        <div class="f-lbl f-last">最近經歷</div><div class="f-val f-last" style="border-right:none;grid-column:span 3;"></div>
+      </div>
+
+      <!-- EMPLOYMENT -->
+      <div class="f-sect"><span class="bar"></span><span class="zh">任用資料（公司填寫）</span><span class="en">Employment</span></div>
+      <div class="f-grid" style="grid-template-columns:78px 1fr 78px 1fr;">
+        <div class="f-lbl">到職日期</div><div class="f-val">　　／　　／　　</div>
+        <div class="f-lbl">所屬部門</div><div class="f-val"></div>
+        <div class="f-lbl">職稱</div><div class="f-val"></div>
+        <div class="f-lbl">試用期間</div><div class="f-val"></div>
+        <div class="f-lbl f-last">核定薪資</div><div class="f-val f-last">NT$　　　　　　元／月</div>
+        <div class="f-lbl f-last">直屬主管</div><div class="f-val f-last"></div>
+      </div>
+
+      <!-- INSURANCE + BANK -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div>
+          <div class="f-sect"><span class="bar"></span><span class="zh">勞健保／勞退</span><span class="en">Insurance</span></div>
+          <div class="f-grid" style="grid-template-columns:84px 1fr;">
+            <div class="f-lbl">勞保加保日</div><div class="f-val" style="border-right:none;">　　／　　／　　</div>
+            <div class="f-lbl">健保眷屬數</div><div class="f-val" style="border-right:none;">＿＿＿ 人</div>
+            <div class="f-lbl f-last">勞退自提</div><div class="f-val f-last" style="border-right:none;">□ 0%　□ ＿＿%</div>
+          </div>
+        </div>
+        <div>
+          <div class="f-sect"><span class="bar"></span><span class="zh">薪資匯款</span><span class="en">Payroll Bank</span></div>
+          <div class="f-grid" style="grid-template-columns:84px 1fr;">
+            <div class="f-lbl">銀行／分行</div><div class="f-val" style="border-right:none;"></div>
+            <div class="f-lbl">帳號</div><div class="f-val" style="border-right:none;"></div>
+            <div class="f-lbl f-last">戶名</div><div class="f-val f-last" style="border-right:none;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CERTS -->
+      <div class="f-sect"><span class="bar"></span><span class="zh">專業證照／技術士</span><span class="en">Certifications</span></div>
+      <div style="border:1px solid #D8D2C4;border-radius:4px;padding:10px 12px;min-height:42px;font-size:10.5px;color:#6B6557;">例：營造業工地主任、職業安全衛生管理員、丙級／乙級技術士、各類技師證書……</div>
+
+      <!-- SIGN -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:14px;">
+        <div style="border:1px solid #D8D2C4;border-radius:4px;padding:9px 12px 11px;">
+          <div style="font-size:10.5px;color:#9A7B2A;font-weight:600;">填表人簽名</div>
+          <div style="height:40px;"></div>
+          <div style="font-size:9.5px;color:#6B6557;border-top:1px dashed #D8D2C4;padding-top:4px;">日期</div>
+        </div>
+        <div style="border:1px solid #D8D2C4;border-radius:4px;padding:9px 12px 11px;">
+          <div style="font-size:10.5px;color:#9A7B2A;font-weight:600;">用人單位主管</div>
+          <div style="height:40px;"></div>
+          <div style="font-size:9.5px;color:#6B6557;border-top:1px dashed #D8D2C4;padding-top:4px;">簽章</div>
+        </div>
+        <div style="border:1px solid #D8D2C4;border-radius:4px;padding:9px 12px 11px;background:#F8F6F0;">
+          <div style="font-size:10.5px;color:#9A7B2A;font-weight:600;">人事單位審核</div>
+          <div style="height:40px;"></div>
+          <div style="font-size:9.5px;color:#6B6557;border-top:1px dashed #D8D2C4;padding-top:4px;">簽章</div>
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <div style="margin-top:12px;padding-top:9px;border-top:1px solid #E2DDD1;display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-family:'Archivo',sans-serif;font-size:8px;font-weight:600;letter-spacing:0.14em;color:#ADA796;text-transform:uppercase;">HONG JU CONSTRUCTION CO., LTD.</div>
+        <div style="font-size:9px;color:#ADA796;letter-spacing:0.06em;">個人資料僅供人事管理及法定用途使用，本公司依個資法妥善保管</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>人事表單總表 · 宏儒營造</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/*hide-chrome*/ .f-chrome{display:none !important;}
+  *{box-sizing:border-box;}
+  body{margin:0;}
+  a{color:inherit;text-decoration:none;}
+  .f-stage{min-height:100vh;background:#EFEBE2;padding:40px 28px 64px;font-family:'Noto Sans TC',sans-serif;}
+  .f-paper{width:210mm;min-height:297mm;margin:0 auto;background:#fff;box-shadow:0 22px 60px rgba(10,26,51,0.18);position:relative;overflow:hidden;}
+  .f-pad{padding:14mm 15mm 12mm;}
+  .f-grp{display:flex;align-items:center;gap:10px;margin:16px 0 8px;}
+  .f-grp .bar{width:4px;height:15px;background:#C9A24A;}
+  .f-grp .zh{font-size:13px;font-weight:700;color:#0A1A33;letter-spacing:0.02em;}
+  .f-grp .en{font-family:'Archivo',sans-serif;font-size:8.5px;font-weight:600;letter-spacing:0.18em;color:#9A7B2A;text-transform:uppercase;}
+  .f-grp .ln{flex:1;height:1px;background:#E2DDD1;}
+  .f-th{background:#0A1A33;color:#fff;font-weight:500;font-size:10.5px;letter-spacing:0.04em;padding:8px 11px;text-align:left;}
+  .f-td{padding:9px 11px;font-size:11px;color:#322F27;border-bottom:1px solid #E2DDD1;vertical-align:top;line-height:1.55;}
+  .f-name{font-weight:600;color:#0A1A33;font-size:11.5px;}
+  .f-name .en{font-family:'Archivo',sans-serif;font-size:8px;font-weight:600;letter-spacing:0.08em;color:#9A8F75;text-transform:uppercase;display:block;margin-top:1px;}
+  .f-no{font-family:'Archivo',sans-serif;font-weight:700;color:#9A7B2A;font-variant-numeric:tabular-nums;}
+  .f-link{display:inline-flex;align-items:center;gap:3px;color:#9A7B2A;font-weight:600;font-size:10px;}
+  @media print{
+    @page{size:A4;margin:0;}
+    html,body{background:#fff !important;}
+    .f-stage{padding:0 !important;background:#fff !important;min-height:0 !important;}
+    .f-chrome{display:none !important;}
+    .f-paper{box-shadow:none !important;width:210mm !important;min-height:297mm !important;margin:0 !important;page-break-after:always;}
+  }
+
+@media print{*{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;}}
+</style>
+</head>
+<body>
+<div class="f-stage">
+
+  <div class="f-chrome" style="max-width:210mm;margin:0 auto 26px;">
+    <div style="width:44px;height:2px;background:#C9A24A;margin-bottom:14px;"></div>
+    <div style="font-family:'Archivo',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.22em;color:#9A7B2A;text-transform:uppercase;">HR Forms Index · 人事表單總表</div>
+    <div style="font-weight:600;font-size:26px;color:#0A1A33;letter-spacing:-0.01em;margin:9px 0 0;">宏儒營造　人事表單總表</div>
+    <div style="font-size:12.5px;color:#6B6557;margin-top:8px;line-height:1.6;">A4 直式　·　彙整全部人事表單　·　表單名稱可點選連結　·　列印或另存 PDF 時自動套用 A4 版面</div>
+  </div>
+
+  <div class="f-paper">
+    <div style="position:absolute;top:0;left:0;right:0;height:4px;background:#C9A24A;"></div>
+    <div class="f-pad">
+
+      <!-- HEADER -->
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;padding-bottom:14px;border-bottom:1.5px solid #0A1A33;">
+        <div style="display:flex;gap:13px;align-items:flex-start;min-width:0;">
+          <img src="logo-h-mark.png" alt="logo" style="height:46px;width:auto;display:block;flex:none;margin-top:2px;">
+          <div style="min-width:0;">
+            <div style="font-weight:700;font-size:19px;color:#0A1A33;letter-spacing:0.01em;line-height:1.2;">宏儒營造有限公司</div>
+            <div style="font-family:'Archivo',sans-serif;font-weight:600;font-size:8px;letter-spacing:0.06em;color:#8C8576;margin-top:3px;">HONG JU CONSTRUCTION CO., LTD.</div>
+            <div style="font-size:10.5px;color:#6B6557;line-height:1.7;margin-top:9px;">
+              <div>台中市豐原區南村路 19 號　TEL 04-2520-5003</div>
+              <div>人事行政單位　·　統一編號 89795586</div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:none;text-align:right;">
+          <div style="font-family:'Noto Serif TC',serif;font-weight:600;font-size:30px;color:#0A1A33;letter-spacing:0.14em;padding-left:0.14em;">人事表單總表</div>
+          <div style="font-family:'Archivo',sans-serif;font-size:9.5px;font-weight:600;letter-spacing:0.22em;color:#9A7B2A;text-transform:uppercase;margin-top:2px;">HR Forms Index</div>
+          <div style="font-size:11px;color:#6B6557;margin-top:11px;font-variant-numeric:tabular-nums;">版本 v1.0　·　更新日 2026 / 07 / 01</div>
+        </div>
+      </div>
+
+      <!-- A. 招募任用 -->
+      <div class="f-grp"><span class="bar"></span><span class="zh">A　招募任用</span><span class="en">Recruitment & Onboarding</span><span class="ln"></span></div>
+      <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
+        <colgroup><col style="width:7%;"><col style="width:25%;"><col style="width:40%;"><col style="width:15%;"><col style="width:13%;"></colgroup>
+        <thead><tr>
+          <th class="f-th" style="text-align:center;border-radius:4px 0 0 0;">編號</th>
+          <th class="f-th">表單名稱</th>
+          <th class="f-th">用途說明</th>
+          <th class="f-th">開立／填寫</th>
+          <th class="f-th" style="border-radius:0 4px 0 0;">表單連結</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td class="f-td f-no" style="text-align:center;">A-01</td>
+            <td class="f-td"><a href="offer-letter.html"><span class="f-name">職務錄取意向書<span class="en">Letter of Offer</span></span></a></td>
+            <td class="f-td">錄取後正式通知職務、薪資與報到條件，供應徵者確認任職意願。</td>
+            <td class="f-td">人事單位開立</td>
+            <td class="f-td"><a class="f-link" href="offer-letter.html">開啟 →</a></td>
+          </tr>
+          <tr style="background:#FAF8F3;">
+            <td class="f-td f-no" style="text-align:center;">A-02</td>
+            <td class="f-td"><a href="employment-contract.html"><span class="f-name">勞動契約書<span class="en">Employment Contract</span></span></a></td>
+            <td class="f-td">報到時簽訂之聘僱契約，依勞基法載明工時、工資、勞健保、勞退與終止條款。</td>
+            <td class="f-td">勞雇雙方簽訂</td>
+            <td class="f-td"><a class="f-link" href="employment-contract.html">開啟 →</a></td>
+          </tr>
+          <tr>
+            <td class="f-td f-no" style="text-align:center;">A-03</td>
+            <td class="f-td"><a href="employee-form.html"><span class="f-name">員工到職／人事資料表<span class="en">Employee Data Form</span></span></a></td>
+            <td class="f-td">新進同仁填寫基本資料、緊急聯絡人、勞健保、薪資匯款及證照資料。</td>
+            <td class="f-td">新進員工填寫</td>
+            <td class="f-td"><a class="f-link" href="employee-form.html">開啟 →</a></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- B. 在職證明 -->
+      <div class="f-grp"><span class="bar"></span><span class="zh">B　在職證明</span><span class="en">Certificates</span><span class="ln"></span></div>
+      <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
+        <colgroup><col style="width:7%;"><col style="width:25%;"><col style="width:40%;"><col style="width:15%;"><col style="width:13%;"></colgroup>
+        <tbody>
+          <tr>
+            <td class="f-td f-no" style="text-align:center;border-top:1px solid #E2DDD1;">B-01</td>
+            <td class="f-td" style="border-top:1px solid #E2DDD1;"><a href="employment-cert.html"><span class="f-name">在職證明書<span class="en">Certificate of Employment</span></span></a></td>
+            <td class="f-td" style="border-top:1px solid #E2DDD1;">證明員工在職事實，供辦理貸款、簽證、租賃等用途。</td>
+            <td class="f-td" style="border-top:1px solid #E2DDD1;">人事單位開立</td>
+            <td class="f-td" style="border-top:1px solid #E2DDD1;"><a class="f-link" href="employment-cert.html">開啟 →</a></td>
+          </tr>
+          <tr style="background:#FAF8F3;">
+            <td class="f-td f-no" style="text-align:center;">B-02</td>
+            <td class="f-td"><a href="salary-cert.html"><span class="f-name">薪資證明書<span class="en">Certificate of Salary</span></span></a></td>
+            <td class="f-td">證明員工固定薪資結構與推估年薪，供信用核定等用途。</td>
+            <td class="f-td">人事單位開立</td>
+            <td class="f-td"><a class="f-link" href="salary-cert.html">開啟 →</a></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- C. 薪酬考勤 -->
+      <div class="f-grp"><span class="bar"></span><span class="zh">C　薪酬與考勤</span><span class="en">Payroll & Conduct</span><span class="ln"></span></div>
+      <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
+        <colgroup><col style="width:7%;"><col style="width:25%;"><col style="width:40%;"><col style="width:15%;"><col style="width:13%;"></colgroup>
+        <tbody>
+          <tr>
+            <td class="f-td f-no" style="text-align:center;border-top:1px solid #E2DDD1;">C-01</td>
+            <td class="f-td" style="border-top:1px solid #E2DDD1;"><a href="payslip.html"><span class="f-name">薪資明細表<span class="en">Payslip</span></span></a></td>
+            <td class="f-td" style="border-top:1px solid #E2DDD1;">每月發薪明細，列示應領、應扣、出勤統計與實發金額（依勞基法§23）。</td>
+            <td class="f-td" style="border-top:1px solid #E2DDD1;">人事單位製表</td>
+            <td class="f-td" style="border-top:1px solid #E2DDD1;"><a class="f-link" href="payslip.html">開啟 →</a></td>
+          </tr>
+          <tr style="background:#FAF8F3;">
+            <td class="f-td f-no" style="text-align:center;">C-02</td>
+            <td class="f-td"><a href="discipline-notice.html"><span class="f-name">員工獎懲通知單<span class="en">Reward / Discipline</span></span></a></td>
+            <td class="f-td">核定員工獎勵或懲處，載明事由、依據並經三層簽核。</td>
+            <td class="f-td">單位提報、人事核定</td>
+            <td class="f-td"><a class="f-link" href="discipline-notice.html">開啟 →</a></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- D. 離職 -->
+      <div class="f-grp"><span class="bar"></span><span class="zh">D　離職</span><span class="en">Separation</span><span class="ln"></span></div>
+      <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
+        <colgroup><col style="width:7%;"><col style="width:25%;"><col style="width:40%;"><col style="width:15%;"><col style="width:13%;"></colgroup>
+        <tbody>
+          <tr>
+            <td class="f-td f-no" style="text-align:center;border-top:1px solid #E2DDD1;">D-01</td>
+            <td class="f-td" style="border-top:1px solid #E2DDD1;"><a href="separation-cert.html"><span class="f-name">離職證明書<span class="en">Certificate of Separation</span></span></a></td>
+            <td class="f-td" style="border-top:1px solid #E2DDD1;">員工離職時開立，載明服務年資與離職事由（依勞基法§19）。</td>
+            <td class="f-td" style="border-top:1px solid #E2DDD1;">人事單位開立</td>
+            <td class="f-td" style="border-top:1px solid #E2DDD1;"><a class="f-link" href="separation-cert.html">開啟 →</a></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- NOTE -->
+      <div style="margin-top:18px;padding:11px 14px;border:1px solid #E2DDD1;border-left:3px solid #C9A24A;border-radius:3px;font-size:10.5px;color:#4B473C;line-height:1.85;">
+        說明：本總表彙整宏儒營造現行人事表單，各表單均採 A4 直式、可直接點選編輯並列印或另存 PDF。表單如有增修，請以人事單位最新發布版本為準。
+      </div>
+
+      <!-- FOOTER -->
+      <div style="margin-top:18px;padding-top:10px;border-top:1px solid #E2DDD1;display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-family:'Archivo',sans-serif;font-size:8.5px;font-weight:600;letter-spacing:0.14em;color:#ADA796;text-transform:uppercase;">HONG JU CONSTRUCTION CO., LTD.</div>
+        <div style="font-size:9.5px;color:#ADA796;letter-spacing:0.08em;">築基立信　·　人事行政管理</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</body>
+</html>
