@@ -55,7 +55,53 @@
     };
   }
 
-  global.HJ = { BRANDS:BRANDS, ADDR:ADDR, TEL:TEL, PHONE:PHONE, FAX:FAX, fmt:fmt, esc:esc, cjk:cjk, makeStore:makeStore };
+  // ---- 共用版面片段（工務表單）----
+  function docHeader(cfg, titleZh, titleEn, metaRows){
+    var meta = (metaRows||[]).map(function(r){
+      var color = r[2]||"#322F27", weight = r[3]||"600";
+      return '<div style="color:#6B6557;">'+r[0]+'</div><div style="color:'+color+';font-weight:'+weight+';font-variant-numeric:tabular-nums;">'+esc(r[1])+'</div>';
+    }).join("");
+    return '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;padding-bottom:14px;border-bottom:1.5px solid #0A1A33;">'+
+      '<div style="display:flex;gap:13px;align-items:flex-start;min-width:0;">'+
+        '<img src="'+cfg.logoSrc+'" alt="logo" style="height:44px;width:auto;display:block;flex:none;margin-top:2px;">'+
+        '<div style="min-width:0;"><div style="font-weight:700;font-size:18px;color:#0A1A33;line-height:1.2;">'+esc(cfg.brandName)+'</div>'+
+        '<div style="font-family:Archivo,sans-serif;font-weight:600;font-size:8px;letter-spacing:0.06em;color:#8C8576;margin-top:3px;">'+esc(cfg.brandEng)+'</div>'+
+        '<div style="font-size:10.5px;color:#6B6557;line-height:1.7;margin-top:8px;"><div>'+ADDR+'　'+TEL+'</div></div></div>'+
+      '</div>'+
+      '<div style="flex:none;text-align:right;">'+
+        '<div style="font-family:\'Noto Serif TC\',serif;font-weight:600;font-size:26px;color:#0A1A33;letter-spacing:0.12em;padding-left:0.12em;">'+titleZh+'</div>'+
+        '<div style="font-family:Archivo,sans-serif;font-size:9px;font-weight:600;letter-spacing:0.2em;color:#9A7B2A;text-transform:uppercase;margin-top:2px;">'+titleEn+'</div>'+
+        '<div style="display:inline-grid;grid-template-columns:auto auto;gap:5px 12px;margin-top:11px;font-size:11px;text-align:left;">'+meta+'</div>'+
+      '</div>'+
+    '</div>';
+  }
+  function projectBlock(projectName, cols){
+    var n=cols.length;
+    var cells=cols.map(function(c,i){
+      var br=i<n-1?'border-right:1px solid #E2DDD1;':'';
+      return '<div style="padding:9px 13px;'+br+'"><div style="font-size:10px;color:#9A7B2A;font-weight:600;">'+c[0]+'</div><div style="font-size:12px;color:#322F27;margin-top:3px;">'+(esc(c[1])||"—")+'</div></div>';
+    }).join("");
+    return '<div style="margin-top:14px;border:1px solid #E2DDD1;border-radius:4px;overflow:hidden;background:#F8F6F0;">'+
+      (projectName!=null?'<div style="padding:9px 13px;border-bottom:1px solid #E2DDD1;"><div style="font-size:10px;color:#9A7B2A;font-weight:600;">工程名稱</div><div style="font-size:12.5px;color:#0A1A33;font-weight:600;margin-top:3px;">'+(esc(projectName)||"—")+'</div></div>':'')+
+      '<div style="display:grid;grid-template-columns:repeat('+n+',1fr);">'+cells+'</div>'+
+    '</div>';
+  }
+  function sectionLbl(txt){
+    return '<div style="font-family:Archivo,sans-serif;font-size:10px;font-weight:600;letter-spacing:0.18em;color:#9A7B2A;text-transform:uppercase;margin:16px 0 8px;display:flex;align-items:center;gap:8px;"><span style="width:16px;height:2px;background:#C9A24A;display:inline-block;"></span>'+txt+'</div>';
+  }
+  function signRow(cols){
+    var cells=cols.map(function(c){
+      return '<div style="border:1px solid #E2DDD1;border-radius:4px;padding:11px 14px 13px;'+(c.bg?'background:#F8F6F0;':'')+'"><div style="font-size:11px;color:#9A7B2A;font-weight:600;">'+c.role+'</div><div style="font-size:11.5px;color:#0A1A33;margin-top:4px;min-height:15px;">'+(esc(c.name||"")||"　")+'</div><div style="height:42px;"></div><div style="font-size:10px;color:#6B6557;border-top:1px dashed #D8D2C4;padding-top:5px;">'+(c.foot||"簽章 / 日期")+'</div></div>';
+    }).join("");
+    return '<div style="display:grid;grid-template-columns:repeat('+cols.length+',1fr);gap:14px;">'+cells+'</div>';
+  }
+  function footer(cfg, note){
+    return '<div style="margin-top:16px;padding-top:10px;border-top:1px solid #E2DDD1;display:flex;justify-content:space-between;align-items:center;"><div style="font-family:Archivo,sans-serif;font-size:8.5px;font-weight:600;letter-spacing:0.14em;color:#ADA796;text-transform:uppercase;">'+esc(cfg.brandEng)+'</div><div style="font-size:9.5px;color:#ADA796;letter-spacing:0.08em;">'+note+'</div></div>';
+  }
+  function box(label){ return '<span style="display:inline-block;width:12px;height:12px;border:1.5px solid #0A1A33;border-radius:2px;vertical-align:-1px;margin-right:5px;"></span>'+(label||""); }
+
+  global.HJ = { BRANDS:BRANDS, ADDR:ADDR, TEL:TEL, PHONE:PHONE, FAX:FAX, fmt:fmt, esc:esc, cjk:cjk, makeStore:makeStore,
+    docHeader:docHeader, projectBlock:projectBlock, sectionLbl:sectionLbl, signRow:signRow, footer:footer, box:box };
 })(window);
 
 /* 手機版：編輯 / 預覽 切換列（套用所有表格頁） */

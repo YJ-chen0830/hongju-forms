@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>工程釋疑單 · 儒鴻 / 宏儒</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="form.css">
+<style>
+  .qedit{width:100%;border-collapse:collapse;table-layout:fixed;}
+  .qedit th{background:#0A1A33;color:#fff;font-size:10px;font-weight:600;letter-spacing:0.04em;padding:6px 6px;text-align:left;}
+  .qedit td{border:1px solid #E2DCCD;padding:4px;vertical-align:top;background:#fff;}
+  .qedit .qe-no{text-align:center;color:#9A7B2A;font-weight:700;font-family:'Archivo',sans-serif;font-size:11px;padding-top:8px;}
+  .qedit textarea{width:100%;border:none;background:none;font-family:inherit;font-size:12px;line-height:1.5;resize:vertical;outline:none;padding:3px 4px;color:#0A1A33;min-height:44px;}
+  .qedit input{width:100%;border:none;background:none;font-family:inherit;font-size:11.5px;outline:none;padding:3px 4px;color:#0A1A33;}
+  .qedit textarea:focus,.qedit input:focus{background:#FBF7EE;border-radius:3px;}
+  .qe-del{border:none;background:none;color:#B24A4A;font-size:12px;cursor:pointer;padding:4px 2px;border-radius:4px;font-weight:600;}
+  .qe-del:hover{background:#FBEAEA;}
+  .qedit td.qe-x{text-align:center;padding-top:6px;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="panel">
+    <div class="p-head">
+      <a class="p-back" href="index.html">← 返回表格中心</a>
+      <div class="p-title">工程釋疑單</div>
+      <div class="p-sub">填寫 → 即時預覽 → 列印 / 存 PDF 給監造、主辦</div>
+    </div>
+    <div class="p-body">
+
+      <div class="sec">
+        <div class="sec-lbl">發文公司</div>
+        <div class="field">
+          <label>發文抬頭</label>
+          <select id="f-brand">
+            <option value="宏儒營造有限公司">宏儒營造有限公司</option>
+            <option value="儒鴻結構土木技師事務所">儒鴻結構土木技師事務所</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-lbl">釋疑單資訊</div>
+        <div class="field"><label>釋疑單編號</label><input id="f-docNo" type="text"></div>
+        <div class="grid2">
+          <div class="field"><label>發文日期</label><input id="f-issueDate" type="text"></div>
+          <div class="field"><label>要求回覆日期</label><input id="f-replyDate" type="text"></div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-lbl">工程資料</div>
+        <div class="field"><label>工程名稱</label><input id="f-projectName" type="text"></div>
+        <div class="field"><label>主辦機關</label><input id="f-owner" type="text"></div>
+        <div class="field"><label>監造單位</label><input id="f-supervisor" type="text"></div>
+        <div class="field"><label>承包廠商</label><input id="f-contractor" type="text"></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-lbl">提問 / 疑義事項</div>
+        <div id="items-editor"></div>
+        <button class="btn btn-ghost" id="add-item" style="margin-top:9px;">＋ 新增一列提問</button>
+      </div>
+
+      <div class="sec">
+        <div class="sec-lbl">檢附附件</div>
+        <div class="field"><label>附件內容（可留空）</label><input id="f-attach" type="text" placeholder="例：設計圖 S-12、大樣圖 D-07、現場照片"></div>
+        <div class="field"><label>附件頁數</label><input id="f-attachPages" type="text" placeholder="例：3"></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-lbl">填表人</div>
+        <div class="field"><label>承包廠商填表人（選填）</label><input id="f-preparedBy" type="text"></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-lbl">輸出</div>
+        <button class="btn btn-gold" id="btn-print" style="margin-bottom:8px;">🖨 列印 / 存成 PDF</button>
+        <div class="btn-row">
+          <button class="btn btn-dark" id="btn-save">💾 另存此份</button>
+          <button class="btn btn-ghost" id="btn-new">＋ 開新單</button>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-lbl">已儲存釋疑單</div>
+        <div id="saved-list"></div>
+      </div>
+
+    </div>
+  </aside>
+
+  <main class="stage">
+    <div class="stage-chrome">
+      <div class="sc-left">
+        <div class="sc-kicker">Request for Clarification · 工程釋疑單</div>
+        <div class="sc-name" id="sc-name"></div>
+        <div class="hint">左側填寫即時更新；「釋疑／答覆」欄留白供監造、主辦填復；自動記住上次內容。</div>
+      </div>
+    </div>
+    <div class="paper" id="paper"></div>
+  </main>
+
+</div>
+
+<script src="shared.js"></script>
+<script>
+(function(){
+  "use strict";
+  var H = window.HJ;
+
+  function defaultState(){
+    return {
+      brand:"宏儒營造有限公司",
+      docNo:"HJ-RFC-1150702-01", issueDate:"2026 / 07 / 02", replyDate:"2026 / 07 / 09",
+      projectName:"○○○區滯洪池及雨水下水道新建工程",
+      owner:"○○市政府水利局",
+      supervisor:"○○工程顧問股份有限公司",
+      contractor:"宏儒營造有限公司",
+      items:[ {content:"依設計圖 S-12 基礎配筋與大樣圖 D-07 標示不符，箍筋間距應以何者為準，請釋示。", ref:"S-12 / D-07"} ],
+      attach:"", attachPages:"", preparedBy:""
+    };
+  }
+
+  var store = H.makeStore("hj_clarification_current","hj_clarification_saved",defaultState);
+  var state = store.loadCur();
+  if(!state.items || !state.items.length) state.items=[{content:"",ref:""}];
+
+  function refresh(){ store.saveCur(state); render(); }
+
+  function render(){
+    var cfg = H.BRANDS[state.brand] || H.BRANDS["宏儒營造有限公司"];
+    document.getElementById("sc-name").textContent = cfg.brandName+"　工程釋疑單";
+
+    var TARGET=4, count=Math.max(TARGET,state.items.length), rows="";
+    for(var i=0;i<count;i++){
+      var it=state.items[i], alt=(i%2===1)?"q-row-alt":"";
+      var content = it ? (H.esc(it.content).replace(/\n/g,"<br>")) : "";
+      var ref = it ? H.esc(it.ref) : "";
+      var contentCell = content || '<span style="color:#B7B1A2;">（請填寫提問內容）</span>';
+      var refCell = ref || '<span style="color:#C2BCAD;">—</span>';
+      rows+='<tr class="'+alt+'">'+
+        '<td class="q-td" style="text-align:center;color:#0A1A33;font-weight:600;font-variant-numeric:tabular-nums;">'+(i+1)+'</td>'+
+        '<td class="q-td" style="line-height:1.7;">'+contentCell+'</td>'+
+        '<td class="q-td" style="color:#4B473C;">'+refCell+'</td>'+
+        '<td class="q-td" style="background:#FBFAF6;">&nbsp;</td>'+
+      '</tr>';
+    }
+
+    var attachLine = (state.attach || state.attachPages)
+      ? '檢附附件：<span style="color:#0A1A33;font-weight:600;">'+(H.esc(state.attach)||"—")+'</span>'+(state.attachPages?'　·　共 '+H.esc(state.attachPages)+' 頁':'')
+      : '檢附附件：<span style="color:#B7B1A2;">無</span>';
+
+    document.getElementById("paper").innerHTML =
+    '<div class="topbar"></div><div class="pad">'+
+      // header
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;padding-bottom:14px;border-bottom:1.5px solid #0A1A33;">'+
+        '<div style="display:flex;gap:13px;align-items:flex-start;min-width:0;">'+
+          '<img src="'+cfg.logoSrc+'" alt="logo" style="height:44px;width:auto;display:block;flex:none;margin-top:2px;">'+
+          '<div style="min-width:0;"><div style="font-weight:700;font-size:18px;color:#0A1A33;line-height:1.2;">'+H.esc(cfg.brandName)+'</div>'+
+          '<div style="font-family:Archivo,sans-serif;font-weight:600;font-size:8px;letter-spacing:0.06em;color:#8C8576;margin-top:3px;">'+H.esc(cfg.brandEng)+'</div>'+
+          '<div style="font-size:10.5px;color:#6B6557;line-height:1.7;margin-top:8px;"><div>'+H.ADDR+'　'+H.TEL+'</div></div></div>'+
+        '</div>'+
+        '<div style="flex:none;text-align:right;">'+
+          '<div style="font-family:\'Noto Serif TC\',serif;font-weight:600;font-size:27px;color:#0A1A33;letter-spacing:0.14em;padding-left:0.14em;">工程釋疑單</div>'+
+          '<div style="font-family:Archivo,sans-serif;font-size:9px;font-weight:600;letter-spacing:0.22em;color:#9A7B2A;text-transform:uppercase;margin-top:2px;">Request For Clarification</div>'+
+          '<div style="display:inline-grid;grid-template-columns:auto auto;gap:5px 12px;margin-top:11px;font-size:11px;text-align:left;">'+
+            '<div style="color:#6B6557;">釋疑單編號</div><div style="color:#322F27;font-weight:600;font-variant-numeric:tabular-nums;">'+H.esc(state.docNo)+'</div>'+
+            '<div style="color:#6B6557;">發文日期</div><div style="color:#322F27;font-weight:600;font-variant-numeric:tabular-nums;">'+H.esc(state.issueDate)+'</div>'+
+            '<div style="color:#6B6557;">要求回覆日期</div><div style="color:#8C3A2E;font-weight:700;font-variant-numeric:tabular-nums;">'+H.esc(state.replyDate)+'</div>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+
+      // project info
+      '<div style="margin-top:14px;border:1px solid #E2DDD1;border-radius:4px;overflow:hidden;background:#F8F6F0;">'+
+        '<div style="padding:9px 13px;border-bottom:1px solid #E2DDD1;"><div style="font-size:10px;color:#9A7B2A;font-weight:600;">工程名稱</div><div style="font-size:12.5px;color:#0A1A33;font-weight:600;margin-top:3px;">'+(H.esc(state.projectName)||"—")+'</div></div>'+
+        '<div style="display:grid;grid-template-columns:repeat(3,1fr);">'+
+          '<div style="padding:9px 13px;border-right:1px solid #E2DDD1;"><div style="font-size:10px;color:#9A7B2A;font-weight:600;">主辦機關</div><div style="font-size:12px;color:#322F27;margin-top:3px;">'+(H.esc(state.owner)||"—")+'</div></div>'+
+          '<div style="padding:9px 13px;border-right:1px solid #E2DDD1;"><div style="font-size:10px;color:#9A7B2A;font-weight:600;">監造單位</div><div style="font-size:12px;color:#322F27;margin-top:3px;">'+(H.esc(state.supervisor)||"—")+'</div></div>'+
+          '<div style="padding:9px 13px;"><div style="font-size:10px;color:#9A7B2A;font-weight:600;">承包廠商</div><div style="font-size:12px;color:#322F27;margin-top:3px;">'+(H.esc(state.contractor)||"—")+'</div></div>'+
+        '</div>'+
+      '</div>'+
+
+      // query table
+      '<div style="font-family:Archivo,sans-serif;font-size:10px;font-weight:600;letter-spacing:0.18em;color:#9A7B2A;text-transform:uppercase;margin:16px 0 8px;display:flex;align-items:center;gap:8px;"><span style="width:16px;height:2px;background:#C9A24A;display:inline-block;"></span>Queries · 提問 / 疑義事項</div>'+
+      '<table style="width:100%;border-collapse:collapse;table-layout:fixed;border:1px solid #0A1A33;border-radius:4px;overflow:hidden;">'+
+        '<colgroup><col style="width:34px;"><col><col style="width:110px;"><col style="width:38%;"></colgroup>'+
+        '<thead><tr>'+
+          '<th class="q-th" style="text-align:center;">項次</th>'+
+          '<th class="q-th">提問 / 疑義內容</th>'+
+          '<th class="q-th">相關圖號 / 章節</th>'+
+          '<th class="q-th">釋疑 / 答覆<span style="font-weight:400;opacity:0.7;font-size:9.5px;"> （監造 / 主辦填列）</span></th>'+
+        '</tr></thead>'+
+        '<tbody>'+rows+'</tbody></table>'+
+
+      // attachment
+      '<div style="margin-top:13px;border:1px solid #E2DDD1;border-radius:4px;padding:10px 14px;font-size:11.5px;color:#4B473C;">'+attachLine+'</div>'+
+
+      // signatures
+      '<div style="font-family:Archivo,sans-serif;font-size:10px;font-weight:600;letter-spacing:0.18em;color:#9A7B2A;text-transform:uppercase;margin:16px 0 8px;display:flex;align-items:center;gap:8px;"><span style="width:16px;height:2px;background:#C9A24A;display:inline-block;"></span>Signatures · 簽核用印</div>'+
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">'+
+        '<div style="border:1px solid #E2DDD1;border-radius:4px;padding:11px 14px 13px;"><div style="font-size:11px;color:#9A7B2A;font-weight:600;">承包廠商（填表）</div><div style="font-size:11.5px;color:#0A1A33;font-weight:600;margin-top:4px;">'+H.esc(cfg.brandName)+'</div><div style="height:44px;"></div><div style="font-size:10px;color:#6B6557;border-top:1px dashed #D8D2C4;padding-top:5px;">'+(state.preparedBy?'填表：'+H.esc(state.preparedBy)+'　':'')+'簽章 / 日期</div></div>'+
+        '<div style="border:1px solid #E2DDD1;border-radius:4px;padding:11px 14px 13px;"><div style="font-size:11px;color:#9A7B2A;font-weight:600;">監造單位（審核）</div><div style="font-size:11.5px;color:#322F27;margin-top:4px;">'+(H.esc(state.supervisor)||"　")+'</div><div style="height:44px;"></div><div style="font-size:10px;color:#6B6557;border-top:1px dashed #D8D2C4;padding-top:5px;">簽章 / 日期</div></div>'+
+        '<div style="border:1px solid #E2DDD1;border-radius:4px;padding:11px 14px 13px;background:#F8F6F0;"><div style="font-size:11px;color:#9A7B2A;font-weight:600;">主辦機關（核定）</div><div style="font-size:11.5px;color:#322F27;margin-top:4px;">'+(H.esc(state.owner)||"　")+'</div><div style="height:44px;"></div><div style="font-size:10px;color:#6B6557;border-top:1px dashed #D8D2C4;padding-top:5px;">簽章 / 日期</div></div>'+
+      '</div>'+
+
+      // footer
+      '<div style="margin-top:16px;padding-top:10px;border-top:1px solid #E2DDD1;display:flex;justify-content:space-between;align-items:center;"><div style="font-family:Archivo,sans-serif;font-size:8.5px;font-weight:600;letter-spacing:0.14em;color:#ADA796;text-transform:uppercase;">'+H.esc(cfg.brandEng)+'</div><div style="font-size:9.5px;color:#ADA796;letter-spacing:0.08em;">本單經監造單位審核、主辦機關核定後生效，並副知承包廠商據以辦理</div></div>'+
+    '</div>';
+  }
+
+  function renderItemsEditor(){
+    var box=document.getElementById("items-editor"), body="";
+    state.items.forEach(function(it,idx){
+      body+='<tr>'+
+        '<td class="qe-no">'+(idx+1)+'</td>'+
+        '<td><textarea data-f="content" data-i="'+idx+'" rows="2" placeholder="提問 / 疑義內容">'+H.esc(it.content)+'</textarea></td>'+
+        '<td><input data-f="ref" data-i="'+idx+'" placeholder="圖號 / 章節" value="'+H.esc(it.ref)+'"></td>'+
+        '<td class="qe-x"><button class="qe-del" data-del="'+idx+'" title="刪除此列">✕</button></td>'+
+      '</tr>';
+    });
+    box.innerHTML='<table class="qedit"><colgroup><col style="width:26px;"><col><col style="width:78px;"><col style="width:24px;"></colgroup>'+
+      '<thead><tr><th style="text-align:center;">#</th><th>提問 / 疑義內容</th><th>圖號 / 章節</th><th></th></tr></thead>'+
+      '<tbody>'+body+'</tbody></table>';
+  }
+
+  function renderSavedList(){
+    var box=document.getElementById("saved-list"), saved=store.loadSaved(), names=Object.keys(saved);
+    if(!names.length){ box.innerHTML='<div class="empty-note">尚無儲存的釋疑單</div>'; return; }
+    box.innerHTML=""; names.sort(function(a,b){return (saved[b]._ts||0)-(saved[a]._ts||0);});
+    names.forEach(function(name){
+      var rec=saved[name], d=rec._ts?new Date(rec._ts):null, meta=d?(d.getMonth()+1)+"/"+d.getDate():"";
+      var el=document.createElement("div"); el.className="saved-item";
+      el.innerHTML='<span class="si-name" title="'+H.esc(name)+'">'+H.esc(name)+'</span><span class="si-meta">'+meta+'</span><button class="si-btn si-load" data-load="'+H.esc(name)+'">載入</button><button class="si-btn si-del" data-sdel="'+H.esc(name)+'">刪除</button>';
+      box.appendChild(el);
+    });
+  }
+
+  function fillForm(){
+    document.getElementById("f-brand").value=state.brand;
+    ["docNo","issueDate","replyDate","projectName","owner","supervisor","contractor","attach","attachPages","preparedBy"].forEach(function(k){
+      var el=document.getElementById("f-"+k); if(el) el.value=state[k]==null?"":state[k];
+    });
+    renderItemsEditor();
+  }
+
+  function bind(){
+    ["docNo","issueDate","replyDate","projectName","owner","supervisor","contractor","attach","attachPages","preparedBy"].forEach(function(k){
+      document.getElementById("f-"+k).addEventListener("input",function(e){ state[k]=e.target.value; refresh(); });
+    });
+    document.getElementById("f-brand").addEventListener("change",function(e){
+      state.brand=e.target.value;
+      // 承包廠商預設帶入抬頭公司（若使用者尚未自行修改）
+      refresh();
+    });
+
+    var box=document.getElementById("items-editor");
+    box.addEventListener("input",function(e){
+      var t=e.target; if(!t.dataset.f) return;
+      var i=+t.dataset.i, f=t.dataset.f;
+      state.items[i][f]=t.value; refresh();
+    });
+    box.addEventListener("click",function(e){
+      var del=e.target.dataset.del; if(del==null) return;
+      state.items.splice(+del,1); if(!state.items.length) state.items.push({content:"",ref:""});
+      renderItemsEditor(); refresh();
+    });
+    document.getElementById("add-item").addEventListener("click",function(){ state.items.push({content:"",ref:""}); renderItemsEditor(); refresh(); });
+
+    document.getElementById("btn-print").addEventListener("click",function(){ window.print(); });
+    document.getElementById("btn-new").addEventListener("click",function(){
+      if(!confirm("開新單會清空目前內容（已另存的不受影響），確定嗎？")) return;
+      var br=state.brand; state=defaultState(); state.brand=br; state.docNo=""; state.projectName=""; state.owner=""; state.supervisor=""; state.items=[{content:"",ref:""}]; fillForm(); refresh();
+    });
+    document.getElementById("btn-save").addEventListener("click",function(){
+      var sug=(state.projectName?state.projectName+"｜":"")+(state.docNo||"釋疑單");
+      var name=prompt("為這份釋疑單命名：",sug); if(!name) return;
+      var saved=store.loadSaved(), copy=JSON.parse(JSON.stringify(state)); copy._ts=Date.now();
+      saved[name]=copy; store.writeSaved(saved); renderSavedList(); alert("已儲存：「"+name+"」");
+    });
+    document.getElementById("saved-list").addEventListener("click",function(e){
+      var ld=e.target.dataset.load, dl=e.target.dataset.sdel;
+      if(ld!=null){ var saved=store.loadSaved(), rec=saved[ld]; if(!rec) return; state=JSON.parse(JSON.stringify(rec)); delete state._ts; if(!state.items||!state.items.length) state.items=[{content:"",ref:""}]; fillForm(); refresh(); }
+      else if(dl!=null){ if(!confirm("刪除「"+dl+"」？")) return; var s=store.loadSaved(); delete s[dl]; store.writeSaved(s); renderSavedList(); }
+    });
+  }
+
+  fillForm(); bind(); render(); renderSavedList();
+})();
+</script>
+</body>
+</html>

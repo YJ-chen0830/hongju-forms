@@ -149,6 +149,32 @@
   </details>
   <details class="cat">
     <summary>
+      <div class="cat-ico">🏗</div>
+      <div class="cat-tt"><div class="cat-nm">工務</div><div class="cat-ds">工程施工文件　·　向監造、主辦提出釋疑　·　線上填寫、列印</div></div>
+      <div class="cat-ct">2 張</div>
+      <div class="cat-cv">▶</div>
+    </summary>
+    <div class="cat-body">
+      <div class="grid">
+      <a class="card ready" href="clarification.html">
+        <div class="c-ico">📝</div>
+        <div class="c-name">工程釋疑單</div>
+        <div class="c-en">Request for Clarification</div>
+        <div class="c-desc">向監造、主辦提出設計圖說、規範、契約等疑義，可列多個提問項目，答覆欄留白供監造 / 主辦填復，列印或存 PDF。</div>
+        <div class="c-foot"><span class="tag tag-ready">可使用</span><span class="go">開始填寫 →</span></div>
+      </a>
+      <a class="card ready" href="change.html">
+        <div class="c-ico">🔄</div>
+        <div class="c-name">工程變更建議單</div>
+        <div class="c-en">Change Proposal</div>
+        <div class="c-desc">提出設計 / 契約變更，含原設計與建議內容、變更理由、對工期與金額之影響，審核欄留白。</div>
+        <div class="c-foot"><span class="tag tag-ready">可使用</span><span class="go">開始填寫 →</span></div>
+      </a>
+      </div>
+    </div>
+  </details>
+  <details class="cat">
+    <summary>
       <div class="cat-ico">👥</div>
       <div class="cat-tt"><div class="cat-nm">人事表單（宏儒營造）</div><div class="cat-ds">招募任用、在職證明、薪酬考勤、離職　·　列印用</div></div>
       <div class="cat-ct">9 張</div>
@@ -271,9 +297,11 @@
     "hj_estimate_current","hj_estimate_saved",
     "hj_receipt_current","hj_receipt_saved",
     "hj_contract_current","hj_contract_saved",
-    "hj_card_current","hj_card_saved"
+    "hj_card_current","hj_card_saved",
+    "hj_clarification_current","hj_clarification_saved",
+    "hj_change_current","hj_change_saved"
   ];
-  var LABELS = {hj_quotation_saved:"報價單",hj_estimate_saved:"估價單/請款單",hj_receipt_saved:"收據",hj_contract_saved:"合約",hj_card_saved:"名片"};
+  var LABELS = {hj_quotation_saved:"報價單",hj_estimate_saved:"估價單/請款單",hj_receipt_saved:"收據",hj_contract_saved:"合約",hj_card_saved:"名片",hj_clarification_saved:"工程釋疑單",hj_change_saved:"變更建議單"};
 
   function countSaved(){
     var parts=[];
