@@ -5,85 +5,148 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>收據生成器 · 儒鴻 / 宏儒</title>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="form.css">
 <style>
-  /* 收據用半頁 A4 */
-  .paper.receipt{min-height:148.5mm;}
-  .rc-amt-box{display:flex;justify-content:space-between;align-items:center;background:#0A1A33;border-radius:5px;padding:14px 18px;margin-top:14px;}
+  *{box-sizing:border-box;}body{margin:0;}
+  .r-stage{min-height:100vh;background:#EFEBE2;padding:40px 28px 64px;font-family:'Noto Sans TC',sans-serif;}
+  .r-chrome{max-width:210mm;margin:0 auto 26px;}
+  .r-back{display:inline-block;font-size:12.5px;color:#9A7B2A;text-decoration:none;font-weight:600;margin-bottom:18px;}
+  .r-back:hover{color:#0A1A33;}
+  .r-ctl{display:flex;align-items:center;gap:12px;margin-top:16px;flex-wrap:wrap;}
+  .r-ctl-lbl{font-size:12.5px;color:#0A1A33;font-weight:600;min-width:52px;}
+  .seg{display:flex;border:1px solid #0A1A33;border-radius:4px;overflow:hidden;}
+  .seg button{all:unset;cursor:pointer;padding:7px 16px;font-size:12.5px;font-family:'Noto Sans TC',sans-serif;background:#fff;color:#0A1A33;}
+  .seg button:hover{background:#F7EFDB;}
+  .seg button.on{background:#0A1A33;color:#fff;font-weight:600;}
+  .r-print{all:unset;cursor:pointer;margin-left:auto;padding:8px 18px;border-radius:4px;background:#C9A24A;color:#0A1A33;font-size:12.5px;font-weight:700;font-family:'Noto Sans TC',sans-serif;}
+  .r-print:hover{background:#D9B96E;}
+
+  .r-paper{outline:none;width:210mm;height:297mm;margin:0 auto;background:#fff;box-shadow:0 22px 60px rgba(10,26,51,0.18);padding:16mm 15mm 14mm;display:flex;flex-direction:column;gap:14px;overflow:hidden;}
+  .bx{border:1px solid #0A1A33;}
+  .kv{display:grid;grid-template-columns:110px 1fr;border:1px solid #0A1A33;font-size:12px;}
+  .kv .k{background:#0A1A33;color:#fff;padding:9px 14px;text-align:center;letter-spacing:0.3em;}
+  .kv .k.n{letter-spacing:0.1em;}
+  .kv .k.t{border-top:1px solid #33465F;}
+  .kv .v{padding:9px 14px;color:#322F27;min-height:36px;}
+  .kv .v.b{border-bottom:1px solid #0A1A33;}
+  .tnum{font-variant-numeric:tabular-nums;}
+
+  .r-cols{display:grid;grid-template-columns:44px 1fr 70px 100px 110px;}
+  .r-row{font-size:12px;color:#322F27;min-height:32px;}
+  .r-row input{all:unset;font-size:12px;width:100%;box-sizing:border-box;border-right:1px solid #0A1A33;font-variant-numeric:tabular-nums;}
+  .r-row input:focus{background:#F7EFDB;}
+  .r-row .c-no{padding:8px 0;text-align:center;color:#8C8576;}
+  .r-row .c-no:focus{background:none;}
+  .r-row .c-name{padding:8px 12px;color:#0A1A33;}
+  .r-row .c-qty{padding:8px 10px;text-align:center;}
+  .r-row .c-price{padding:8px 10px;text-align:right;}
+  .r-row .c-amount{padding:8px 10px;text-align:right;font-weight:600;color:#0A1A33;border-right:0;}
+
+  .sign{padding:10px 14px;display:flex;flex-direction:column;}
+  .sign .s-h{text-align:center;color:#0A1A33;font-weight:600;letter-spacing:0.08em;}
+  .sign .s-f{border-top:1px solid #0A1A33;padding-top:5px;text-align:center;font-size:10px;color:#6B6557;min-height:21px;}
+
+  @media print{@page{size:A4;margin:0;}html,body{background:#fff !important;}.r-stage{padding:0 !important;background:#fff !important;min-height:0 !important;}.r-chrome{display:none !important;}.r-paper{box-shadow:none !important;margin:0 !important;}}
 </style>
 </head>
 <body>
-<div class="app">
+<div class="r-stage">
 
-  <aside class="panel">
-    <div class="p-head">
-      <a class="p-back" href="index.html">← 返回表格中心</a>
-      <div class="p-title">收據生成器</div>
-      <div class="p-sub">填寫 → 即時預覽 → 列印 / 存 PDF</div>
+  <div class="r-chrome">
+    <a class="r-back" href="index.html">← 返回表格中心</a>
+    <div style="width:44px;height:2px;background:#C9A24A;margin-bottom:14px;"></div>
+    <div style="font-family:'Archivo',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.22em;color:#9A7B2A;text-transform:uppercase;">Receipt · 收據</div>
+    <div style="font-weight:600;font-size:26px;color:#0A1A33;margin-top:9px;"><span id="sc-name"></span>　收據</div>
+    <div style="font-size:12.5px;color:#6B6557;margin-top:8px;">A4 直式　·　紙面任何文字可直接點選修改　·　改好後直接列印或另存 PDF</div>
+    <div class="r-ctl">
+      <span class="r-ctl-lbl">收款單位</span>
+      <div class="seg" id="seg-brand"></div>
     </div>
-    <div class="p-body">
+    <div class="r-ctl">
+      <span class="r-ctl-lbl">營業稅</span>
+      <div class="seg" id="seg-tax"></div>
+      <button class="r-print" id="btn-print">🖨 列印 / 存成 PDF</button>
+    </div>
+  </div>
 
-      <div class="sec">
-        <div class="sec-lbl">公司</div>
-        <div class="field">
-          <label>收款單位</label>
-          <select id="f-brand">
-            <option value="儒鴻結構土木技師事務所">儒鴻結構土木技師事務所</option>
-            <option value="宏儒營造有限公司">宏儒營造有限公司</option>
-          </select>
+  <div class="r-paper" contenteditable="true" spellcheck="false">
+    <div class="bx">
+      <div style="background:#0A1A33;padding:14px 18px;display:flex;align-items:center;justify-content:center;gap:14px;">
+        <img id="p-logo" src="" alt="logo" style="height:40px;width:auto;display:block;">
+        <div style="text-align:center;">
+          <div id="p-brand" style="font-family:'Noto Serif TC',serif;font-weight:700;font-size:22px;color:#fff;letter-spacing:0.12em;"></div>
+          <div id="p-eng" style="font-family:'Archivo',sans-serif;font-weight:600;font-size:9px;letter-spacing:0.14em;color:#D9B96E;margin-top:3px;"></div>
         </div>
       </div>
-
-      <div class="sec">
-        <div class="sec-lbl">收據資訊</div>
-        <div class="field"><label>收據號碼</label><input id="f-rcNo" type="text"></div>
-        <div class="field"><label>開立日期</label><input id="f-rcDate" type="text"></div>
-      </div>
-
-      <div class="sec">
-        <div class="sec-lbl">收款內容</div>
-        <div class="field"><label>茲收到（付款人／單位）</label><input id="f-payer" type="text"></div>
-        <div class="field"><label>款項金額（數字）</label><input id="f-amount" type="number" placeholder="0"></div>
-        <div class="field">
-          <label>付款方式</label>
-          <select id="f-method">
-            <option value="現金">現金</option>
-            <option value="銀行匯款">銀行匯款</option>
-            <option value="即期支票">即期支票</option>
-            <option value="轉帳">轉帳</option>
-          </select>
-        </div>
-        <div class="field"><label>款項事由 / 用途</label><textarea id="f-purpose" rows="3" placeholder="例：SLIT COATER 補充說明編纂服務費"></textarea></div>
-        <div class="field"><label>備註（選填）</label><input id="f-note" type="text"></div>
-      </div>
-
-      <div class="sec">
-        <div class="sec-lbl">輸出</div>
-        <button class="btn btn-gold" id="btn-print" style="margin-bottom:8px;">🖨 列印 / 存成 PDF</button>
-        <div class="btn-row">
-          <button class="btn btn-dark" id="btn-save">💾 另存此份</button>
-          <button class="btn btn-ghost" id="btn-new">＋ 開新單</button>
-        </div>
-      </div>
-
-      <div class="sec">
-        <div class="sec-lbl">已儲存收據</div>
-        <div id="saved-list"></div>
-      </div>
-
+      <div style="padding:7px 14px;text-align:center;font-size:10.5px;color:#4B473C;letter-spacing:0.04em;">台中市豐原區南村路 19 號　·　TEL 04-2520-5003　·　FAX 04-2520-6399　·　統一編號 <span id="p-taxid"></span></div>
     </div>
-  </aside>
 
-  <main class="stage">
-    <div class="stage-chrome">
-      <div class="sc-left">
-        <div class="sc-kicker">Receipt · 收據</div>
-        <div class="sc-name" id="sc-name"></div>
-        <div class="hint">列印時為半頁 A4；自動記住上次內容。</div>
+    <div style="text-align:center;margin-top:4px;">
+      <div style="font-family:'Noto Serif TC',serif;font-weight:700;font-size:30px;color:#0A1A33;letter-spacing:0.6em;padding-left:0.6em;">收據</div>
+      <div style="font-family:'Archivo',sans-serif;font-size:9.5px;font-weight:600;letter-spacing:0.3em;color:#9A7B2A;margin-top:2px;">RECEIPT</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;border:1px solid #0A1A33;font-size:12px;">
+      <div style="padding:8px 14px;border-right:1px solid #0A1A33;display:flex;gap:12px;"><span style="color:#6B6557;">收據編號</span><span id="p-rcNo" class="tnum" style="color:#0A1A33;font-weight:600;"></span></div>
+      <div style="padding:8px 14px;display:flex;gap:12px;"><span style="color:#6B6557;">開立日期</span><span id="p-rcDate" class="tnum" style="color:#0A1A33;font-weight:600;"></span></div>
+    </div>
+
+    <div class="kv">
+      <div class="k">付款人</div><div class="v b" style="color:#0A1A33;font-weight:600;"></div>
+      <div class="k n t">統一編號</div><div class="v b tnum"></div>
+      <div class="k t">地址</div><div class="v"></div>
+    </div>
+
+    <div class="bx">
+      <div class="r-cols" style="background:#0A1A33;color:#fff;font-size:11.5px;">
+        <div style="padding:9px 0;text-align:center;">項次</div><div style="padding:9px 14px;text-align:center;letter-spacing:0.3em;">項目說明</div><div style="padding:9px 0;text-align:center;">數量</div><div style="padding:9px 0;text-align:center;">單價</div><div style="padding:9px 0;text-align:center;">金額</div>
+      </div>
+      <div id="rows"></div>
+      <div style="display:grid;grid-template-columns:1fr 280px;border-top:1px solid #0A1A33;font-size:12px;">
+        <div id="p-taxNote" style="padding:9px 14px;border-right:1px solid #0A1A33;color:#6B6557;font-size:11px;line-height:1.6;"></div>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:6px 14px;padding:9px 12px;">
+          <span style="color:#6B6557;">小計</span><span id="p-subtotal" class="tnum" style="text-align:right;"></span>
+          <span id="p-taxLabel" style="color:#6B6557;"></span><span id="p-tax" class="tnum" style="text-align:right;min-width:60px;"></span>
+          <span class="wh" style="color:#6B6557;">暫繳稅額 10%</span><span id="p-whTax" class="wh tnum" style="text-align:right;"></span>
+          <span class="wh" style="color:#0A1A33;font-weight:600;">實付金額</span><span id="p-netPay" class="wh tnum" style="text-align:right;font-weight:600;color:#0A1A33;"></span>
+        </div>
+      </div>
+      <div style="background:#0A1A33;display:flex;justify-content:flex-end;align-items:baseline;gap:22px;padding:10px 14px;">
+        <span id="p-totalLabel" style="color:#D9B96E;font-weight:600;font-size:13px;letter-spacing:0.08em;"></span>
+        <span style="font-family:'Archivo',sans-serif;color:#D9B96E;font-size:12px;font-weight:600;">NTD</span>
+        <span id="p-total" class="tnum" style="color:#fff;font-weight:700;font-size:19px;min-width:110px;text-align:right;"></span>
       </div>
     </div>
-    <div class="paper receipt" id="paper"></div>
-  </main>
+
+    <div class="kv">
+      <div class="k n">金額大寫</div><div class="v" style="color:#0A1A33;font-weight:600;letter-spacing:0.08em;">新臺幣 <span id="p-totalCJK"></span> 元整</div>
+    </div>
+
+    <div class="kv">
+      <div class="k n">匯款帳戶</div>
+      <div class="v b" style="display:grid;grid-template-columns:1fr 1fr 1.3fr;gap:10px;"><span>銀行：</span><span>分行：</span><span class="tnum">帳號：</span></div>
+      <div class="k t">戶名</div><div class="v"></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid #0A1A33;min-height:100px;font-size:11.5px;">
+      <div class="sign" style="border-right:1px solid #0A1A33;">
+        <div class="s-h">事務所負責人（簽章）</div>
+        <div style="flex:1;"></div>
+        <div class="s-f"></div>
+      </div>
+      <div class="sign" style="border-right:1px solid #0A1A33;">
+        <div class="s-h">經手人</div>
+        <div style="flex:1;"></div>
+        <div class="s-f">陳彥儒</div>
+      </div>
+      <div class="sign">
+        <div class="s-h" style="letter-spacing:0.5em;padding-left:0.5em;">收款人</div>
+        <div style="flex:1;"></div>
+        <div class="s-f">（請加蓋公司大小章）</div>
+      </div>
+    </div>
+
+    <div style="border:1px solid #0A1A33;padding:9px 14px;font-size:11px;color:#4B473C;line-height:1.7;min-height:52px;"><span style="color:#9A7B2A;font-weight:600;">備註　</span>本收據經負責人簽章及收款人用印後生效。</div>
+  </div>
 
 </div>
 
@@ -92,124 +155,103 @@
 (function(){
   "use strict";
   var H = window.HJ;
+  function $(id){ return document.getElementById(id); }
+  function pad(n){ return (n<10?"0":"")+n; }
 
-  function defaultState(){
-    return {
-      brand:"儒鴻結構土木技師事務所",
-      rcNo:"RJ-1150623-01", rcDate:"2026 / 06 / 23",
-      payer:"", amount:0, method:"現金", purpose:"", note:""
-    };
-  }
-  var store = H.makeStore("hj_receipt_current","hj_receipt_saved",defaultState);
-  var state = store.loadCur();
-  function refresh(){ store.saveCur(state); render(); }
+  var TAX_MODES = ["含稅","外加 5%","免稅","暫繳 10%"];
+  var TAX_NOTE = {
+    "含稅":"上列單價已含 5% 營業稅，小計與稅額依含稅總額回推。",
+    "外加 5%":"上列單價未稅，另加計 5% 營業稅。",
+    "免稅":"本收據免開營業稅。",
+    "暫繳 10%":"本收據金額由付款人依法暫繳（扣繳）10% 稅款，實付金額為扣除暫繳稅額後之金額。"
+  };
 
-  function render(){
-    var cfg = H.BRANDS[state.brand] || H.BRANDS["儒鴻結構土木技師事務所"];
-    var amt = Number(state.amount)||0;
-    document.getElementById("sc-name").textContent = cfg.brandName+"　收據";
+  var brand = "儒鴻結構土木技師事務所", mode = "暫繳 10%";
+  var items = [];
+  while(items.length<5) items.push(blank());
+  items[0].no = "1";
 
-    document.getElementById("paper").innerHTML =
-    '<div class="topbar"></div><div class="pad">'+
-      // header
-      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;padding-bottom:16px;border-bottom:1.5px solid #0A1A33;">'+
-        '<div style="display:flex;gap:13px;align-items:flex-start;min-width:0;">'+
-          '<img src="'+cfg.logoSrc+'" alt="logo" style="height:46px;width:auto;display:block;flex:none;margin-top:2px;">'+
-          '<div><div style="font-weight:700;font-size:19px;color:#0A1A33;line-height:1.2;">'+H.esc(cfg.brandName)+'</div>'+
-          '<div style="font-family:Archivo,sans-serif;font-weight:600;font-size:8px;letter-spacing:0.06em;color:#8C8576;margin-top:3px;">'+H.esc(cfg.brandEng)+'</div>'+
-          '<div style="font-size:10.5px;color:#6B6557;line-height:1.7;margin-top:9px;"><div>'+H.ADDR+'</div><div>'+H.TEL+'　·　統一編號 '+cfg.taxId+'</div></div></div>'+
-        '</div>'+
-        '<div style="flex:none;text-align:right;">'+
-          '<div style="font-family:\'Noto Serif TC\',serif;font-weight:600;font-size:34px;color:#0A1A33;letter-spacing:0.3em;padding-left:0.3em;">收據</div>'+
-          '<div style="font-family:Archivo,sans-serif;font-size:9.5px;font-weight:600;letter-spacing:0.26em;color:#9A7B2A;text-transform:uppercase;margin-top:1px;">Receipt</div>'+
-          '<div style="display:inline-grid;grid-template-columns:auto auto;gap:5px 12px;margin-top:13px;font-size:11px;text-align:left;">'+
-            '<div style="color:#6B6557;">收據號碼</div><div style="color:#322F27;font-weight:600;font-variant-numeric:tabular-nums;">'+H.esc(state.rcNo)+'</div>'+
-            '<div style="color:#6B6557;">開立日期</div><div style="color:#322F27;font-weight:600;font-variant-numeric:tabular-nums;">'+H.esc(state.rcDate)+'</div>'+
-          '</div>'+
-        '</div>'+
-      '</div>'+
+  function blank(){ return { no:"", name:"", qty:"", price:"", amount:"" }; }
+  function num(v){ return Number(String(v||"").replace(/,/g,""))||0; }
+  function hasQP(it){ return String(it.qty).trim()!=="" && String(it.price).trim()!==""; }
+  // 金額欄有手動輸入就以手動為準，否則為 數量 × 單價
+  function rowAmt(it){ return it.amount!=="" ? num(it.amount) : (hasQP(it) ? num(it.qty)*num(it.price) : 0); }
 
-      // body
-      '<div style="margin-top:22px;font-size:14px;color:#322F27;line-height:2;">'+
-        '<div>茲收到　<span style="font-weight:700;color:#0A1A33;border-bottom:1px solid #C9A24A;padding:0 10px 2px;">'+(H.esc(state.payer)||"　　　　　　　　")+'</span>　交付下列款項：</div>'+
-      '</div>'+
-
-      // amount box
-      '<div class="rc-amt-box">'+
-        '<div><div style="font-family:Archivo,sans-serif;font-size:9px;font-weight:600;letter-spacing:0.16em;color:#D9B96E;text-transform:uppercase;">Amount · 金額</div>'+
-          '<div style="font-size:15px;color:#fff;font-weight:600;margin-top:5px;letter-spacing:0.04em;">新臺幣 '+H.cjk(amt)+' 元整</div></div>'+
-        '<div style="text-align:right;"><div style="font-family:Archivo,sans-serif;font-size:9px;letter-spacing:0.1em;color:#8AA8CE;">NT$</div>'+
-          '<div class="q-num" style="font-size:26px;color:#fff;font-weight:700;">'+H.fmt(amt)+'</div></div>'+
-      '</div>'+
-
-      // detail
-      '<div style="display:grid;grid-template-columns:72px 1fr;row-gap:11px;column-gap:14px;margin-top:18px;font-size:12.5px;">'+
-        '<div style="color:#9A7B2A;font-weight:600;">付款方式</div><div style="color:#322F27;">'+H.esc(state.method)+'</div>'+
-        '<div style="color:#9A7B2A;font-weight:600;">款項事由</div><div style="color:#322F27;line-height:1.6;">'+(H.esc(state.purpose).replace(/\n/g,"<br>")||"—")+'</div>'+
-        (state.note?'<div style="color:#9A7B2A;font-weight:600;">備　　註</div><div style="color:#6B6557;">'+H.esc(state.note)+'</div>':'')+
-      '</div>'+
-
-      // sign
-      '<div style="display:flex;justify-content:flex-end;margin-top:34px;">'+
-        '<div style="width:46%;border:1px solid #E2DDD1;border-radius:4px;padding:12px 16px 16px;">'+
-          '<div style="font-size:11px;color:#9A7B2A;font-weight:600;margin-bottom:8px;">收款單位（簽章用印）</div>'+
-          '<div style="font-size:13px;color:#0A1A33;font-weight:700;">'+H.esc(cfg.brandName)+'</div>'+
-          '<div style="height:52px;"></div>'+
-          '<div style="font-size:10.5px;color:#6B6557;">經手人：＿＿＿＿＿＿＿＿</div>'+
-        '</div>'+
-      '</div>'+
-
-      '<div style="margin-top:18px;padding-top:10px;border-top:1px solid #E2DDD1;display:flex;justify-content:space-between;align-items:center;"><div style="font-family:Archivo,sans-serif;font-size:8.5px;font-weight:600;letter-spacing:0.14em;color:#ADA796;text-transform:uppercase;">'+H.esc(cfg.brandEng)+'</div><div style="font-size:9.5px;color:#ADA796;letter-spacing:0.08em;">此據經簽章用印後生效</div></div>'+
-    '</div>';
+  function seg(boxId, opts, get, set){
+    var box = $(boxId);
+    function paint(){
+      box.innerHTML = opts.map(function(o){ return '<button type="button" data-v="'+H.esc(o)+'"'+(o===get()?' class="on"':'')+'>'+H.esc(o)+'</button>'; }).join("");
+    }
+    box.addEventListener("click",function(e){
+      var b = e.target.closest("button"); if(!b) return;
+      set(b.getAttribute("data-v")); paint();
+    });
+    paint();
   }
 
-  function renderSavedList(){
-    var box=document.getElementById("saved-list"), saved=store.loadSaved(), names=Object.keys(saved);
-    if(!names.length){ box.innerHTML='<div class="empty-note">尚無儲存的收據</div>'; return; }
-    box.innerHTML=""; names.sort(function(a,b){return (saved[b]._ts||0)-(saved[a]._ts||0);});
-    names.forEach(function(name){
-      var rec=saved[name], d=rec._ts?new Date(rec._ts):null, meta=d?(d.getMonth()+1)+"/"+d.getDate():"";
-      var el=document.createElement("div"); el.className="saved-item";
-      el.innerHTML='<span class="si-name" title="'+H.esc(name)+'">'+H.esc(name)+'</span><span class="si-meta">'+meta+'</span><button class="si-btn si-load" data-load="'+H.esc(name)+'">載入</button><button class="si-btn si-del" data-sdel="'+H.esc(name)+'">刪除</button>';
-      box.appendChild(el);
-    });
+  function addRow(i){
+    var it = items[i], el = document.createElement("div");
+    el.className = "r-cols r-row";
+    el.innerHTML = ["no","name","qty","price","amount"].map(function(k){
+      return '<input class="c-'+k+'" data-k="'+k+'" data-i="'+i+'" value="'+H.esc(it[k])+'"'+(k==="qty"||k==="price"||k==="amount"?' inputmode="decimal"':'')+'>';
+    }).join("");
+    $("rows").appendChild(el);
+    if(it.amount==="" && hasQP(it)) el.querySelector(".c-amount").value = H.fmt(rowAmt(it));
   }
 
-  function fillForm(){
-    document.getElementById("f-brand").value=state.brand;
-    document.getElementById("f-method").value=state.method;
-    ["rcNo","rcDate","payer","amount","purpose","note"].forEach(function(k){
-      var el=document.getElementById("f-"+k); if(el) el.value=state[k]==null?"":state[k];
-    });
+  function renderBrand(){
+    var cfg = H.BRANDS[brand] || H.BRANDS["儒鴻結構土木技師事務所"];
+    $("sc-name").textContent = cfg.brandName;
+    $("p-brand").textContent = cfg.brandName;
+    $("p-eng").textContent = cfg.brandEng;
+    $("p-taxid").textContent = cfg.taxId;
+    $("p-logo").src = cfg.logoLight;
   }
 
-  function bind(){
-    ["rcNo","rcDate","payer","purpose","note"].forEach(function(k){
-      document.getElementById("f-"+k).addEventListener("input",function(e){ state[k]=e.target.value; refresh(); });
-    });
-    document.getElementById("f-amount").addEventListener("input",function(e){ state.amount=e.target.value===""?0:Number(e.target.value); refresh(); });
-    document.getElementById("f-brand").addEventListener("change",function(e){ state.brand=e.target.value; refresh(); });
-    document.getElementById("f-method").addEventListener("change",function(e){ state.method=e.target.value; refresh(); });
+  function renderTotals(){
+    var sub = 0; items.forEach(function(it){ sub += rowAmt(it); });
+    var subtotal, tax, total;
+    if(mode==="含稅"){ total=sub; subtotal=Math.round(sub/1.05); tax=total-subtotal; }
+    else if(mode==="外加 5%"){ subtotal=sub; tax=Math.round(sub*0.05); total=sub+tax; }
+    else { subtotal=sub; tax=0; total=sub; }
+    var isWh = mode==="暫繳 10%", wh = Math.round(total*0.1);
 
-    document.getElementById("btn-print").addEventListener("click",function(){ window.print(); });
-    document.getElementById("btn-new").addEventListener("click",function(){
-      if(!confirm("開新單會清空目前內容（已另存的不受影響），確定嗎？")) return;
-      state=defaultState(); state.rcNo=""; state.payer=""; state.amount=0; state.purpose=""; fillForm(); refresh();
-    });
-    document.getElementById("btn-save").addEventListener("click",function(){
-      var sug=(state.payer?state.payer+"｜":"")+(state.rcNo||"收據")+"｜NT$"+H.fmt(Number(state.amount)||0);
-      var name=prompt("為這份收據命名：",sug); if(!name) return;
-      var saved=store.loadSaved(), copy=JSON.parse(JSON.stringify(state)); copy._ts=Date.now();
-      saved[name]=copy; store.writeSaved(saved); renderSavedList(); alert("已儲存：「"+name+"」");
-    });
-    document.getElementById("saved-list").addEventListener("click",function(e){
-      var ld=e.target.dataset.load, dl=e.target.dataset.sdel;
-      if(ld!=null){ var saved=store.loadSaved(), rec=saved[ld]; if(!rec) return; state=JSON.parse(JSON.stringify(rec)); delete state._ts; fillForm(); refresh(); }
-      else if(dl!=null){ if(!confirm("刪除「"+dl+"」？")) return; var s=store.loadSaved(); delete s[dl]; store.writeSaved(s); renderSavedList(); }
-    });
+    $("p-taxNote").textContent = TAX_NOTE[mode];
+    $("p-subtotal").textContent = H.fmt(subtotal);
+    $("p-taxLabel").textContent = (mode==="免稅"||isWh) ? "營業稅" : "營業稅 5%";
+    $("p-tax").textContent = mode==="免稅" ? "免稅" : isWh ? "" : H.fmt(tax);
+    $("p-whTax").textContent = "-"+H.fmt(wh);
+    $("p-netPay").textContent = H.fmt(total-wh);
+    var whEls = document.querySelectorAll(".wh");
+    for(var i=0;i<whEls.length;i++) whEls[i].style.display = isWh ? "" : "none";
+    $("p-totalLabel").textContent = mode==="免稅" ? "合計總額（免稅）" : isWh ? "合計總額" : "合計總額（含稅）";
+    $("p-total").textContent = H.fmt(total);
+    $("p-totalCJK").textContent = H.cjk(total);
   }
 
-  fillForm(); bind(); render(); renderSavedList();
+  $("rows").addEventListener("input",function(e){
+    var k = e.target.getAttribute("data-k"); if(!k) return;
+    var i = Number(e.target.getAttribute("data-i")), it = items[i];
+    it[k] = e.target.value;
+    if(k==="qty"||k==="price"){
+      it.amount = "";
+      e.target.parentNode.querySelector(".c-amount").value = hasQP(it) ? H.fmt(rowAmt(it)) : "";
+    }
+    // 最後一列有內容時自動補一列空白
+    if(i===items.length-1 && (it.name||it.qty||it.price)){ items.push(blank()); addRow(items.length-1); }
+    renderTotals();
+  });
+
+  $("btn-print").addEventListener("click",function(){ window.print(); });
+
+  var d = new Date(), roc = d.getFullYear()-1911;
+  $("p-rcNo").textContent = roc+"-"+pad(d.getMonth()+1)+pad(d.getDate());
+  $("p-rcDate").textContent = roc+" 年 "+pad(d.getMonth()+1)+" 月 "+pad(d.getDate())+" 日";
+
+  seg("seg-brand", Object.keys(H.BRANDS), function(){ return brand; }, function(v){ brand=v; renderBrand(); });
+  seg("seg-tax", TAX_MODES, function(){ return mode; }, function(v){ mode=v; renderTotals(); });
+  items.forEach(function(_,i){ addRow(i); });
+  renderBrand(); renderTotals();
 })();
 </script>
 </body>
