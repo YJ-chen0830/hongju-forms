@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>組織架構與職級圖 · 宏儒營造</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;}
+  a{color:inherit;text-decoration:none;}
+  .f-stage{min-height:100vh;background:#EFEBE2;padding:40px 28px 64px;font-family:'Noto Sans TC',sans-serif;color:#322F27;overflow-x:auto;}
+  .f-paper{width:297mm;min-height:210mm;margin:0 auto 28px;background:#fff;box-shadow:0 22px 60px rgba(10,26,51,0.18);position:relative;overflow:hidden;}
+  .f-pad{padding:11mm 13mm 9mm;}
+  .back{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#9A7B2A;font-weight:600;letter-spacing:0.04em;margin-bottom:14px;}
+
+  /* header */
+  .hd{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;padding-bottom:10px;border-bottom:1.5px solid #0A1A33;}
+  .hd-l{display:flex;gap:13px;align-items:flex-start;}
+  .hd-l img{height:42px;width:auto;display:block;margin-top:2px;}
+  .hd-co{font-weight:700;font-size:18px;color:#0A1A33;line-height:1.2;}
+  .hd-en{font-family:'Archivo',sans-serif;font-weight:600;font-size:8px;letter-spacing:0.06em;color:#8C8576;margin-top:3px;}
+  .hd-ad{font-size:10px;color:#6B6557;margin-top:6px;}
+  .hd-r{text-align:right;}
+  .hd-tt{font-family:'Noto Serif TC',serif;font-weight:600;font-size:27px;color:#0A1A33;letter-spacing:0.12em;}
+  .hd-tte{font-family:'Archivo',sans-serif;font-size:9px;font-weight:600;letter-spacing:0.22em;color:#9A7B2A;text-transform:uppercase;margin-top:2px;}
+  .hd-ver{font-size:10.5px;color:#6B6557;margin-top:7px;font-variant-numeric:tabular-nums;}
+
+  /* ladder grid */
+  .lad{display:grid;grid-template-columns:22mm 1fr 1fr;gap:2.2mm 3mm;margin-top:5mm;}
+  .lv{display:flex;flex-direction:column;align-items:center;justify-content:center;border-right:2px solid #C9A24A;padding-right:2mm;}
+  .lv b{font-family:'Archivo',sans-serif;font-size:15px;color:#0A1A33;letter-spacing:0.04em;}
+  .lv span{font-size:8.5px;color:#9A7B2A;font-weight:700;letter-spacing:0.1em;margin-top:1px;}
+  .colh{font-size:12px;font-weight:700;color:#fff;background:#0A1A33;border-radius:4px;padding:6px 11px;display:flex;justify-content:space-between;align-items:center;}
+  .colh i{font-style:normal;font-family:'Archivo',sans-serif;font-size:8.5px;letter-spacing:0.16em;color:#D9B96E;font-weight:600;}
+  .bx{border:1px solid #E2DDD1;border-left:4px solid #0A1A33;border-radius:5px;padding:5px 10px 6px;background:#fff;display:flex;gap:9px;align-items:flex-start;min-height:18mm;}
+  .bx.e{border-left-color:#0A1A33;}
+  .bx.a{border-left-color:#C9A24A;}
+  .bx.mg{background:#0A1A33;border-color:#0A1A33;color:#fff;}
+  .bx.mg .nm{color:#fff;}.bx.mg .ds{color:#D6D0C2;}.bx.mg .cd{background:#C9A24A;color:#0A1A33;}
+  .bx.empty{border:1px dashed #D8D1C2;background:#FAF8F3;align-items:center;}
+  .bx.empty .ds{color:#9A8F75;}
+  .cd{flex:none;font-family:'Archivo',sans-serif;font-weight:700;font-size:10.5px;background:#0A1A33;color:#D9B96E;border-radius:4px;padding:3px 6px;margin-top:2px;letter-spacing:0.04em;}
+  .bx.a .cd{background:#C9A24A;color:#fff;}
+  .tx{flex:1;min-width:0;}
+  .nm{font-weight:700;font-size:13px;color:#0A1A33;}
+  .nm em{font-style:normal;font-family:'Archivo',sans-serif;font-size:8px;letter-spacing:0.12em;color:#9A7B2A;font-weight:600;margin-left:6px;text-transform:uppercase;}
+  .ds{font-size:9.6px;color:#6B6557;line-height:1.5;margin-top:1px;}
+  .bg{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px;}
+  .bd{font-size:8.6px;font-weight:700;border-radius:20px;padding:1.5px 7px;letter-spacing:0.02em;}
+  .bd-c{background:#F4EAD2;color:#7A5F1C;}
+  .bd-r{background:#E8ECF2;color:#0A1A33;}
+  .bd-q{background:#EFEBE2;color:#6B6557;}
+  .span2{grid-column:2 / span 2;}
+  .mgrow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3mm;}
+  .bx.st{border-style:dashed;border-left-style:solid;border-left-color:#9A8F75;}
+
+  .legend{margin-top:4mm;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:9.5px;color:#6B6557;border-top:1px solid #E2DDD1;padding-top:3mm;}
+  .legend .bd{font-size:8.6px;}
+  .lg-x{display:inline-flex;align-items:center;gap:5px;}
+
+  /* page 2 */
+  .grp{display:flex;align-items:center;gap:10px;margin:12px 0 7px;}
+  .grp .bar{width:4px;height:14px;background:#C9A24A;}
+  .grp .zh{font-size:12.5px;font-weight:700;color:#0A1A33;}
+  .grp .en{font-family:'Archivo',sans-serif;font-size:8.5px;font-weight:600;letter-spacing:0.18em;color:#9A7B2A;text-transform:uppercase;}
+  .grp .ln{flex:1;height:1px;background:#E2DDD1;}
+  table{width:100%;border-collapse:collapse;table-layout:fixed;}
+  th{background:#0A1A33;color:#fff;font-weight:500;font-size:9.8px;letter-spacing:0.04em;padding:6px 8px;text-align:left;}
+  td{padding:5px 8px;font-size:9.6px;color:#322F27;border-bottom:1px solid #E2DDD1;vertical-align:top;line-height:1.5;}
+  tr:nth-child(even) td{background:#FAF8F3;}
+  td.cd2{font-family:'Archivo',sans-serif;font-weight:700;color:#9A7B2A;text-align:center;}
+  td.t{font-weight:700;color:#0A1A33;}
+  .blank{display:inline-block;min-width:22mm;border-bottom:1px solid #9A8F75;height:12px;}
+  .two{display:grid;grid-template-columns:1.05fr 1fr;gap:6mm;}
+  .note{padding:7px 11px;border:1px solid #E2DDD1;border-left:3px solid #C9A24A;border-radius:3px;font-size:9.4px;color:#4B473C;line-height:1.75;}
+  .note b{color:#0A1A33;}
+  .sign{display:grid;grid-template-columns:repeat(3,1fr);gap:5mm;margin-top:5mm;}
+  .sign div{border-top:1px solid #322F27;padding-top:4px;font-size:9.5px;color:#6B6557;text-align:center;}
+  .ft{margin-top:4mm;padding-top:6px;border-top:1px solid #E2DDD1;display:flex;justify-content:space-between;font-size:8.5px;color:#ADA796;letter-spacing:0.1em;}
+  .ft span:first-child{font-family:'Archivo',sans-serif;font-weight:600;text-transform:uppercase;}
+
+  @media print{
+    @page{size:A4 landscape;margin:0;}
+    *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;}
+    html,body{background:#fff !important;}
+    .f-stage{padding:0 !important;background:#fff !important;min-height:0 !important;}
+    .f-chrome{display:none !important;}
+    .f-paper{box-shadow:none !important;margin:0 !important;width:297mm !important;height:210mm !important;min-height:0 !important;page-break-after:always;break-after:page;}
+    .f-paper:last-of-type{page-break-after:auto;break-after:auto;}
+  }
+</style>
+</head>
+<body>
+<div class="f-stage">
+
+  <div class="f-chrome" style="max-width:297mm;margin:0 auto 22px;">
+    <a class="back" href="index.html">← 回表格中心</a>
+    <div style="width:44px;height:2px;background:#C9A24A;margin-bottom:12px;"></div>
+    <div style="font-family:'Archivo',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.22em;color:#9A7B2A;text-transform:uppercase;">Career Ladder · 組織架構與職級圖</div>
+    <div style="font-weight:600;font-size:26px;color:#0A1A33;margin:9px 0 0;">宏儒營造　組織架構與職級圖</div>
+    <div style="font-size:12.5px;color:#6B6557;margin-top:8px;line-height:1.6;">A4 橫式兩頁　·　第 1 頁職級圖、第 2 頁晉升條件與職級加給　·　列印或另存 PDF 時自動套用 A4 橫式版面</div>
+  </div>
+
+  <!-- ================= PAGE 1：職級圖 ================= -->
+  <div class="f-paper">
+    <div style="position:absolute;top:0;left:0;right:0;height:4px;background:#C9A24A;"></div>
+    <div class="f-pad">
+      <div class="hd">
+        <div class="hd-l">
+          <img src="logo-h-mark.png" alt="logo">
+          <div>
+            <div class="hd-co">宏儒營造有限公司</div>
+            <div class="hd-en">HONG JU CONSTRUCTION CO., LTD.</div>
+            <div class="hd-ad">台中市豐原區南村路 19 號　TEL 04-2520-5003　·　統一編號 89795586</div>
+          </div>
+        </div>
+        <div class="hd-r">
+          <div class="hd-tt">組織架構與職級圖</div>
+          <div class="hd-tte">Organization &amp; Career Ladder</div>
+          <div class="hd-ver">版本 v1.0（草案）　·　2026 / 11 / 18　·　取代 112.03.01 版組織架構圖</div>
+        </div>
+      </div>
+
+      <div class="lad">
+        <!-- 經營層 -->
+        <div class="lv"><b>M</b><span>經營管理</span></div>
+        <div class="span2 mgrow">
+          <div class="bx mg"><div class="cd">M3</div><div class="tx"><div class="nm">總經理／副總經理<em>Executive</em></div><div class="ds">經營決策、承攬策略、人事任免與職級核定</div></div></div>
+          <div class="bx mg"><div class="cd">M1</div><div class="tx"><div class="nm">協理<em>Director</em></div><div class="ds">統籌工務部與事務部；公司文件出公司前須經協理以上簽核</div></div></div>
+          <div class="bx st"><div class="cd" style="background:#9A8F75;color:#fff;">顧</div><div class="tx"><div class="nm">執行顧問<em>Advisor</em></div><div class="ds">幕僚職，提供技術與經營建議，不列入職級序列</div></div></div>
+        </div>
+
+        <!-- 欄頭 -->
+        <div></div>
+        <div class="colh">工務職系　工務部<i>ENGINEERING TRACK · E</i></div>
+        <div class="colh" style="background:#9A7B2A;">事務職系　事務部<i style="color:#fff;">ADMINISTRATION TRACK · A</i></div>
+
+        <!-- L5 -->
+        <div class="lv"><b>L5</b><span>主管級</span></div>
+        <div class="bx e"><div class="cd">E5</div><div class="tx"><div class="nm">專案經理<em>Project Manager</em></div><div class="ds">職司現場所有事務、估驗計價、結算決算、監造會勘；一人案量上限 1 億元</div><div class="bg"><span class="bd bd-r">小團績：專案經理</span><span class="bd bd-q">考績連續 2 年甲等以上</span></div></div></div>
+        <div class="bx empty"><div class="tx"><div class="ds">事務職系最高為 A4 事務主任；續升循管理職（M1 協理），或取得工務證照轉任工務職系。</div></div></div>
+
+        <!-- L4 -->
+        <div class="lv"><b>L4</b><span>資深級</span></div>
+        <div class="bx e"><div class="cd">E4</div><div class="tx"><div class="nm">副專案經理<em>Deputy PM</em></div><div class="ds">協助專案經理管理大型案件；專案經理案量逾 1 億元時應設置</div><div class="bg"><span class="bd bd-c">工地主任</span><span class="bd bd-r">小團績：專案經理</span></div></div></div>
+        <div class="bx a"><div class="cd">A4</div><div class="tx"><div class="nm">事務主任<em>Office Chief</em></div><div class="ds">事務部主管；收發文審視、文件品質把關、事務人力調度</div><div class="bg"><span class="bd bd-r">小團績：專案助理</span><span class="bd bd-q">考績連續 2 年甲等以上</span></div></div></div>
+
+        <!-- L3 -->
+        <div class="lv"><b>L3</b><span>主辦級</span></div>
+        <div class="bx e"><div class="cd">E3</div><div class="tx"><div class="nm">工地主任<em>Site Director</em></div><div class="ds">依營造業法擔任工地主任；可獨立負責 1,000 萬元以下案件</div><div class="bg"><span class="bd bd-c">工地主任結業證書</span><span class="bd bd-r">小團績：專案經理</span></div></div></div>
+        <div class="bx a"><div class="cd">A3</div><div class="tx"><div class="nm">主辦（會計／人事採發）<em>Officer</em></div><div class="ds">獨立負責一項功能：會計帳務、人事勞健保、採購發包詢價</div><div class="bg"><span class="bd bd-c">相關專業證照（加分）</span><span class="bd bd-r">小團績：專案助理</span></div></div></div>
+
+        <!-- L2 -->
+        <div class="lv"><b>L2</b><span>專業級</span></div>
+        <div class="bx e"><div class="cd">E2</div><div class="tx"><div class="nm">工程師<em>Engineer</em></div><div class="ds">負責分項施工管理、查驗、估驗資料與施工日誌</div><div class="bg"><span class="bd bd-c">品管人員 或 職安證照（擇一）</span></div></div></div>
+        <div class="bx a"><div class="cd">A2</div><div class="tx"><div class="nm">專案助理<em>Project Assistant</em></div><div class="ds">協助專案文書（計畫書、估驗、送審）；可兼多案，一人案量上限 5,000 萬元</div><div class="bg"><span class="bd bd-r">小團績：專案助理</span></div></div></div>
+
+        <!-- L1 -->
+        <div class="lv"><b>L1</b><span>助理級</span></div>
+        <div class="bx e"><div class="cd">E1</div><div class="tx"><div class="nm">工務助理<em>Site Assistant</em></div><div class="ds">現場紀錄、照片、日報與查驗資料整理；試用期 3 個月</div><div class="bg"><span class="bd bd-q">新進起點</span></div></div></div>
+        <div class="bx a"><div class="cd">A1</div><div class="tx"><div class="nm">事務助理<em>Office Assistant</em></div><div class="ds">收發文登錄、歸檔、用印寄件、收發文 Excel 維護；試用期 3 個月</div><div class="bg"><span class="bd bd-q">新進起點</span></div></div></div>
+      </div>
+
+      <div class="legend">
+        <span class="lg-x"><span class="bd bd-c">證照</span>晉升至該級應具備之證照</span>
+        <span class="lg-x"><span class="bd bd-r">小團績</span>適用獎金辦法之角色欄</span>
+        <span class="lg-x"><span class="bd bd-q">條件</span>其他晉升條件（詳第 2 頁）</span>
+        <span class="lg-x">同一列（L1–L5）為同職等，跨職系轉任時職等原則不變。</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PAGE 2：晉升條件 ================= -->
+  <div class="f-paper">
+    <div style="position:absolute;top:0;left:0;right:0;height:4px;background:#C9A24A;"></div>
+    <div class="f-pad">
+      <div class="hd">
+        <div class="hd-l">
+          <img src="logo-h-mark.png" alt="logo">
+          <div>
+            <div class="hd-co">宏儒營造有限公司</div>
+            <div class="hd-en">HONG JU CONSTRUCTION CO., LTD.</div>
+          </div>
+        </div>
+        <div class="hd-r">
+          <div class="hd-tt" style="font-size:22px;">職級晉升條件</div>
+          <div class="hd-tte">Promotion Criteria</div>
+        </div>
+      </div>
+
+      <div class="grp"><span class="bar"></span><span class="zh">晉升至各職級之條件</span><span class="en">Criteria by Grade</span><span class="ln"></span></div>
+      <table>
+        <colgroup><col style="width:5.5%;"><col style="width:13%;"><col style="width:12%;"><col style="width:21%;"><col style="width:30%;"><col style="width:18.5%;"></colgroup>
+        <thead><tr><th style="text-align:center;">職級</th><th>職稱</th><th>年資參考</th><th>證照門檻</th><th>實績條件</th><th>職級加給（元／月）</th></tr></thead>
+        <tbody>
+          <tr><td class="cd2">E1／A1</td><td class="t">工務助理／事務助理</td><td>到職</td><td>—</td><td>通過 3 個月試用期考核</td><td><span class="blank"></span></td></tr>
+          <tr><td class="cd2">E2</td><td class="t">工程師</td><td>本公司滿 1 年</td><td>品質管理人員 或 職安相關證照（擇一）</td><td>參與 1 案以上完成估驗計價；近一年考績乙等以上</td><td><span class="blank"></span></td></tr>
+          <tr><td class="cd2">A2</td><td class="t">專案助理</td><td>本公司滿 1 年</td><td>—</td><td>獨立完成 1 案計畫書與估驗文書；收發文無逾期</td><td><span class="blank"></span></td></tr>
+          <tr><td class="cd2">E3</td><td class="t">工地主任</td><td>E2 滿 2 年</td><td>工地主任結業證書</td><td>參與 2 案完工驗收；近一年考績甲等以上</td><td><span class="blank"></span></td></tr>
+          <tr><td class="cd2">A3</td><td class="t">主辦</td><td>A2 滿 2 年</td><td>相關專業證照列為加分</td><td>獨立負責一項功能（會計／人事／採發）滿 1 年；近一年考績甲等以上</td><td><span class="blank"></span></td></tr>
+          <tr><td class="cd2">E4</td><td class="t">副專案經理</td><td>E3 滿 2 年</td><td>工地主任＋品管或職安其一</td><td>以工地主任身分主導 2 案驗收（領有驗收證明書），無重大職災與重大缺失</td><td><span class="blank"></span></td></tr>
+          <tr><td class="cd2">A4</td><td class="t">事務主任</td><td>A3 滿 2 年</td><td>—</td><td>帶領事務人員 1 人以上；考績連續 2 年甲等以上</td><td><span class="blank"></span></td></tr>
+          <tr><td class="cd2">E5</td><td class="t">專案經理</td><td>E4 滿 2 年</td><td>同 E4</td><td>獨立負責 3,000 萬元以上案件 1 案完成驗收；考績連續 2 年甲等以上</td><td><span class="blank"></span></td></tr>
+          <tr><td class="cd2">M1</td><td class="t">協理</td><td>L5 或 A4 滿 3 年</td><td>—</td><td>由總經理／副總經理提名，經營層核定</td><td><span class="blank"></span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="two" style="margin-top:2mm;">
+        <div>
+          <div class="grp"><span class="bar"></span><span class="zh">證照補助（沿用現行標準）</span><span class="en">License Subsidy</span><span class="ln"></span></div>
+          <table>
+            <colgroup><col style="width:62%;"><col style="width:38%;"></colgroup>
+            <thead><tr><th>證照名稱</th><th>補助金額（一次）</th></tr></thead>
+            <tbody>
+              <tr><td>工地主任</td><td>5,000 元</td></tr>
+              <tr><td>品質管理人員、職安技術士</td><td>3,000 元</td></tr>
+              <tr><td>營造業職業安全衛生業務主管</td><td>1,000 元</td></tr>
+              <tr><td>其他特殊證照</td><td>經上級簽核後補助</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <div class="grp"><span class="bar"></span><span class="zh">晉升程序與說明</span><span class="en">Procedure</span><span class="ln"></span></div>
+          <div class="note">
+            <b>1. 時程：</b>每年會計年度考績完成後辦理一次；符合條件者由直屬主管提名，協理初審，總經理／副總經理核定。<br>
+            <b>2. 年資：</b>年資為參考值，實績與證照均達標者得提前晉升；未達標者不因年資自動晉升。<br>
+            <b>3. 考績：</b>依考績制度，優等平均 &gt; 3.5、甲等 &gt; 3、乙等 &gt; 2.5。<br>
+            <b>4. 跨職系：</b>事務人員取得工務證照者，得申請轉任工務職系，職等原則不變。<br>
+            <b>5. 加給性質：</b>職級加給每月固定發給，屬勞基法第 2 條之工資，計入加班費、平均工資及勞退提繳；證照補助為一次性給付。
+          </div>
+        </div>
+      </div>
+
+      <div class="sign"><div>制定（人事單位）</div><div>審核（協理）</div><div>核定（總經理／副總經理）</div></div>
+
+      <div class="ft"><span>HONG JU CONSTRUCTION CO., LTD.</span><span>築基立信　·　人事行政管理</span></div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
